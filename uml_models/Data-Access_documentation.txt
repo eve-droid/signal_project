@@ -1,0 +1,17 @@
+Data-Access layer UML class diagram documentation:
+
+With data continuously streaming in from diverse sources, 
+it is imperative that the system possesses the capability to effectively manage and interact with a wide array of data sources. 
+This crucial flexibility is ensured by the robust Data-Access Layer system, which is equipped with three distinct listener classes: 
+FileDataListener, WebSocketDataListener, and TCPDataListener. 
+Each of these listener classes has been meticulously modelled to cater to their specific type of data source, 
+thereby guaranteeing a seamless integration process. By adhering to the DataListener interface, 
+these classes not only maintain uniformity across the system but also pave the way for effortless scalability, 
+as the integration of a new class tailored to a new data source type can be seamlessly incorporated into the system.
+
+Given the diverse nature of the data sources handled by the system, 
+it becomes essential to first parse the incoming data before it can undergo further processing. 
+The role of the DataParser class comes to the fore in overseeing this intricate parsing process, 
+thereby enabling the subsequent processing and storage of the data by the DataSourceAdapter class within the system's framework. 
+This orchestrated sequence of data handling ensures the smooth and efficient utilization of the varied data streams captured by the system, 
+ultimately contributing to the system's overall operational efficacy and adaptability

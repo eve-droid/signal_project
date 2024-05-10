@@ -8,7 +8,7 @@ import com.cardio_generator.outputs.OutputStrategy;
  * 
  * The class implements the interface PatiantDataGenerator
  */
-public class AlertGenerator implements PatientDataGenerator {
+public class AlertGenerator2 implements PatientDataGenerator {
 
     public static final Random randomGenerator = new Random();
     private boolean[] AlertStates; // false = resolved, true = pressed
@@ -18,7 +18,7 @@ public class AlertGenerator implements PatientDataGenerator {
      * 
      * @param patientCount number of patients
      */
-    public AlertGenerator(int patientCount) {
+    public AlertGenerator2(int patientCount) {
         AlertStates = new boolean[patientCount + 1];
     }
 

@@ -4,7 +4,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import com.cardio_generator.generators.AlertGenerator;
+import javax.swing.JButton;
+
+import com.alerts.Alert;
+import com.alerts.AlertGenerator;
+import com.cardio_generator.generators.AlertGenerator2;
 
 import com.cardio_generator.generators.BloodPressureDataGenerator;
 import com.cardio_generator.generators.BloodSaturationDataGenerator;
@@ -15,10 +19,15 @@ import com.cardio_generator.outputs.FileOutputStrategy;
 import com.cardio_generator.outputs.OutputStrategy;
 import com.cardio_generator.outputs.TcpOutputStrategy;
 import com.cardio_generator.outputs.WebSocketOutputStrategy;
+import com.data_management.DataStorage;
+import com.data_management.Patient;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.awt.Button;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -165,7 +174,7 @@ public class HealthDataSimulator {
         BloodSaturationDataGenerator bloodSaturationDataGenerator = new BloodSaturationDataGenerator(patientCount);
         BloodPressureDataGenerator bloodPressureDataGenerator = new BloodPressureDataGenerator(patientCount);
         BloodLevelsDataGenerator bloodLevelsDataGenerator = new BloodLevelsDataGenerator(patientCount);
-        AlertGenerator alertGenerator = new AlertGenerator(patientCount);
+        AlertGenerator2 alertGenerator = new AlertGenerator2(patientCount);
 
         for (int patientId : patientIds) {
             scheduleTask(() -> ecgDataGenerator.generate(patientId, outputStrategy), 1, TimeUnit.SECONDS);
@@ -185,5 +194,19 @@ public class HealthDataSimulator {
      */
     private static void scheduleTask(Runnable task, long period, TimeUnit timeUnit) {
         scheduler.scheduleAtFixedRate(task, random.nextInt(5), period, timeUnit);
+    }
+
+
+    public void triggerAlert(Button alertButton, Patient patient){
+        alertButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Emit an event to indicate that a triggered alert should be generated
+                AlertGenerator alertGenerator = new AlertGenerator(new DataStorage());
+                alertGenerator.triggerAlert(new Alert(patient.getPatientId(), "Manual alert for patient " + patient.getPatientId(), System.currentTimeMillis()));;
+            }
+
+            
+        });
     }
 }

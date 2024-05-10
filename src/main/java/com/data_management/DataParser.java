@@ -37,11 +37,23 @@ public class DataParser implements DataReader{
 
                         String[] lineSplit = line.split(",");
 
+                        for(int i =0; i<lineSplit.length; i++){
+                            String [] onlyData = lineSplit[i].split(":");
+                            lineSplit[i] = onlyData[1];
+                        }
+
                         //assumption: each line of the files has the patient number, the timestamp, the type of measurement (label) and the measurement value in this order separated by a comma
-                        int patientID = Integer.parseInt(lineSplit[0]);
-                        long timestamp = Long.parseLong(lineSplit[1]);
-                        String recordType = lineSplit[2]; //e.g. ECG, blood pressure
-                        double data = Double.parseDouble(lineSplit[3]); //measurement value
+                        int patientID = Integer.parseInt(lineSplit[0].trim());
+                        long timestamp = Long.parseLong(lineSplit[1].trim());
+                        String recordType = lineSplit[2].trim(); //e.g. ECG, blood pressure
+                        double data;
+                        if(recordType.equals("Saturation")){
+                            String[] dataString = lineSplit[3].split("%");
+                            data = Double.parseDouble(dataString[0].trim());
+                        } else{
+                            data = Double.parseDouble(lineSplit[3].trim()); //measurement value
+                        }
+                        
 
                         dataStorage.addPatientData(patientID, data, recordType, timestamp); // pass the line read to the data storage
                     }

@@ -2,6 +2,8 @@ package com.alerts;
 
 import java.util.List;
 
+import com.cardio_generator.outputs.OutputStrategy;
+import com.cardio_generator.outputs.TcpOutputStrategy;
 import com.data_management.DataStorage;
 import com.data_management.Patient;
 import com.data_management.PatientRecord;
@@ -39,10 +41,13 @@ public class AlertGenerator {
      */
     public void evaluateData(Patient patient) {
 
-        List<PatientRecord> patientRecord = patient.getRecords(0, 20000); //not sure of the endtime
+        String patientId = patient.getPatientId();
+        List<PatientRecord> patientRecord = dataStorage.getRecords(Integer.parseInt(patientId), 0, 20000); //not sure of the endtime
 
-        boolean systolicPressureTooLow = false;;
+        boolean systolicPressureTooLow = false;
         boolean saturationTooLow = false;
+        int irregularBpm = 0;
+        double lastBpm = -1;
 
         for (int i = 0; i < patientRecord.size(); i++){
 
@@ -56,9 +61,9 @@ public class AlertGenerator {
 
                 case "DiastolicPressure": 
                     if (measurement < 60){
-                        triggerAlert(new Alert(patient.getPatientId(), "Critical Treshold Alert: Diastolic Pressure to low", record.getTimestamp()));
+                        triggerAlert(new Alert(patientId, "Critical Treshold Alert: Diastolic Pressure to low", record.getTimestamp()));
                     } else if(measurement > 120){
-                        triggerAlert(new Alert(patient.getPatientId(), "Critical Treshold Alert: Diastolic Pressure to high", record.getTimestamp()));
+                        triggerAlert(new Alert(patientId, "Critical Treshold Alert: Diastolic Pressure to high", record.getTimestamp()));
                     }
 
                     for (int t = i+1; t < patientRecord.size(); t++){
@@ -70,7 +75,7 @@ public class AlertGenerator {
                                 if(!decrease){
                                     decrease = true;
                                 } else {
-                                    triggerAlert(new Alert(patient.getPatientId(), "Decreasing Trend Alert", record.getTimestamp()));
+                                    triggerAlert(new Alert(patientId, "Decreasing Trend Alert", record.getTimestamp()));
                                     break;
                                 }
                             }
@@ -79,7 +84,7 @@ public class AlertGenerator {
                                 if(!increase){
                                     increase = true;
                                 } else {
-                                    triggerAlert(new Alert(patient.getPatientId(), "Increasing Trend Alert", record.getTimestamp()));
+                                    triggerAlert(new Alert(patientId, "Increasing Trend Alert", record.getTimestamp()));
                                     break;
                                 }
                             }
@@ -95,14 +100,14 @@ public class AlertGenerator {
                     systolicPressureTooLow = false;
                     if (measurement < 90){
                         if(saturationTooLow){
-                            triggerAlert(new Alert(patient.getPatientId(), "Critical Treshold Alert: Hypotensive Hypoxemia Alert", record.getTimestamp()));
+                            triggerAlert(new Alert(patientId, "Critical Treshold Alert: Hypotensive Hypoxemia Alert", record.getTimestamp()));
                         } else {
-                            triggerAlert(new Alert(patient.getPatientId(), "Critical Treshold Alert: Systolic pressure too low", record.getTimestamp()));
+                            triggerAlert(new Alert(patientId, "Critical Treshold Alert: Systolic pressure too low", record.getTimestamp()));
                         }
 
                         systolicPressureTooLow = true;
                     } else if(measurement > 180){
-                        triggerAlert(new Alert(patient.getPatientId(), "Critical Treshold Alert: Systolic pressure too high", record.getTimestamp()));
+                        triggerAlert(new Alert(patientId, "Critical Treshold Alert: Systolic pressure too high", record.getTimestamp()));
                     }
 
                     for (int t = i+1; t < patientRecord.size(); t++){
@@ -114,7 +119,7 @@ public class AlertGenerator {
                                 if(!decrease){
                                     decrease = true;
                                 } else {
-                                    triggerAlert(new Alert(patient.getPatientId(), "Decreasing Trend Alert", currentRecord.getTimestamp()));
+                                    triggerAlert(new Alert(patientId, "Decreasing Trend Alert", currentRecord.getTimestamp()));
                                     break;
                                 }
                             }
@@ -123,7 +128,7 @@ public class AlertGenerator {
                                 if(!increase){
                                     increase = true;
                                 } else {
-                                    triggerAlert(new Alert(patient.getPatientId(), "Increasing Trend Alert", currentRecord.getTimestamp()));
+                                    triggerAlert(new Alert(patientId, "Increasing Trend Alert", currentRecord.getTimestamp()));
                                     break;
                                 }
                             }
@@ -140,9 +145,9 @@ public class AlertGenerator {
 
                     if(measurement < 92){
                         if(systolicPressureTooLow){
-                            triggerAlert(new Alert(patient.getPatientId(), "Hypotensive Hypoxemia Alert", record.getTimestamp()));
+                            triggerAlert(new Alert(patientId, "Hypotensive Hypoxemia Alert", record.getTimestamp()));
                         } else{
-                            triggerAlert(new Alert(patient.getPatientId(), "Critical Treshold Alert: Blood Saturation too low", record.getTimestamp()));
+                            triggerAlert(new Alert(patientId, "Critical Treshold Alert: Blood Saturation too low", record.getTimestamp()));
                         }
                         saturationTooLow = true;
                     }
@@ -153,12 +158,42 @@ public class AlertGenerator {
 
                     for(t = i+1; t < patientRecord.size() && currentRecord.getTimestamp() <= timestamp + (10*60*1000); t++){
                         if(patientRecord.get(t).getMeasurementValue() <= measurement -5){
-                            triggerAlert(new Alert(patient.getPatientId(), "Decreasing Trend Alert", patientRecord.get(t).getTimestamp()));
+                            triggerAlert(new Alert(patientId, "Decreasing Trend Alert", patientRecord.get(t).getTimestamp()));
                             break;
                         }
                         currentRecord = patientRecord.get(t);
                     }
+                    break;
 
+                case "ECG":
+                    for(int k = i+1; k < patientRecord.size(); k++){
+                        if(patientRecord.get(k).getRecordType().equals("ECG")){
+                            double bpm = Math.abs(measurement-patientRecord.get(k).getMeasurementValue());
+
+                            if (bpm < 50){
+                                triggerAlert(new Alert(patientId, "Critical Treshold Alert: Heart Rate to low", record.getTimestamp()));
+                            } else if(bpm > 100){
+                                triggerAlert(new Alert(patientId, "Critical Treshold Alert: Heart Rate to high", record.getTimestamp()));
+                            }
+
+                            if (lastBpm >= 0 && (bpm <= lastBpm - 10 || bpm >= lastBpm + 10)){
+                                irregularBpm++;
+                            }else{
+                                if(irregularBpm > 0){
+                                    irregularBpm--;
+                                }
+                            }
+
+                            if(irregularBpm >= 5){
+                                triggerAlert(new Alert(patientId, "Trend Alert: Abnormal Heart Rate", record.getTimestamp()));
+                                irregularBpm = 0;
+                            }
+
+                            lastBpm = measurement;
+                            break;
+                        }
+                    }
+                    
                     
 
             }
@@ -174,7 +209,10 @@ public class AlertGenerator {
      *
      * @param alert the alert object containing details about the alert condition
      */
-    private void triggerAlert(Alert alert) {
+    public void triggerAlert(Alert alert) {
+
+        OutputStrategy outputStrategy = new TcpOutputStrategy(3); //not sure what the port number should be
+        outputStrategy.output(Integer.parseInt(alert.getPatientId()), alert.getTimestamp(), alert.getCondition(), "triggered");
         // Implementation might involve logging the alert or notifying staff
     }
 }

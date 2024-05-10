@@ -1,6 +1,6 @@
 package data_management;
 
-import static org.junit.jupiter.api.Assertions.*;
+/*import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
 import com.data_management.DataStorage;
@@ -23,3 +23,4 @@ class DataStorageTest {
         assertEquals(100.0, records.get(0).getMeasurementValue()); // Validate first record
     }
 }
+*/

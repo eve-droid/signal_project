@@ -1,7 +1,10 @@
 package com.alerts;
 
+import java.util.List;
+
 import com.data_management.DataStorage;
 import com.data_management.Patient;
+import com.data_management.PatientRecord;
 
 /**
  * The {@code AlertGenerator} class is responsible for monitoring patient data
@@ -35,7 +38,132 @@ public class AlertGenerator {
      * @param patient the patient data to evaluate for alert conditions
      */
     public void evaluateData(Patient patient) {
-        // Implementation goes here
+
+        List<PatientRecord> patientRecord = patient.getRecords(0, 20000); //not sure of the endtime
+
+        boolean systolicPressureTooLow = false;;
+        boolean saturationTooLow = false;
+
+        for (int i = 0; i < patientRecord.size(); i++){
+
+            PatientRecord record = patientRecord.get(i);
+            double measurement = record.getMeasurementValue();
+            double lastMeasurement = measurement;
+            boolean decrease = false;
+            boolean increase = false;
+
+            switch (record.getRecordType()){
+
+                case "DiastolicPressure": 
+                    if (measurement < 60){
+                        triggerAlert(new Alert(patient.getPatientId(), "Critical Treshold Alert: Diastolic Pressure to low", record.getTimestamp()));
+                    } else if(measurement > 120){
+                        triggerAlert(new Alert(patient.getPatientId(), "Critical Treshold Alert: Diastolic Pressure to high", record.getTimestamp()));
+                    }
+
+                    for (int t = i+1; t < patientRecord.size(); t++){
+                        PatientRecord currentRecord = patientRecord.get(t);
+                        
+                        if (currentRecord.getRecordType().equals("DiastolicPressure")){
+                            double currentRecordMeasurement = currentRecord.getMeasurementValue();
+                            if(currentRecordMeasurement < lastMeasurement -10){
+                                if(!decrease){
+                                    decrease = true;
+                                } else {
+                                    triggerAlert(new Alert(patient.getPatientId(), "Decreasing Trend Alert", record.getTimestamp()));
+                                    break;
+                                }
+                            }
+
+                            else if (currentRecordMeasurement > lastMeasurement +10){
+                                if(!increase){
+                                    increase = true;
+                                } else {
+                                    triggerAlert(new Alert(patient.getPatientId(), "Increasing Trend Alert", record.getTimestamp()));
+                                    break;
+                                }
+                            }
+
+                            else{ break;}
+
+                            lastMeasurement = currentRecordMeasurement;
+                        }
+                    }
+                    break;
+
+                case "SystolicPressure" : 
+                    systolicPressureTooLow = false;
+                    if (measurement < 90){
+                        if(saturationTooLow){
+                            triggerAlert(new Alert(patient.getPatientId(), "Critical Treshold Alert: Hypotensive Hypoxemia Alert", record.getTimestamp()));
+                        } else {
+                            triggerAlert(new Alert(patient.getPatientId(), "Critical Treshold Alert: Systolic pressure too low", record.getTimestamp()));
+                        }
+
+                        systolicPressureTooLow = true;
+                    } else if(measurement > 180){
+                        triggerAlert(new Alert(patient.getPatientId(), "Critical Treshold Alert: Systolic pressure too high", record.getTimestamp()));
+                    }
+
+                    for (int t = i+1; t < patientRecord.size(); t++){
+                        PatientRecord currentRecord = patientRecord.get(t);
+                        
+                        if (currentRecord.getRecordType().equals("DiastolicPressure")){
+                            double currentRecordMeasurement = currentRecord.getMeasurementValue();
+                            if(currentRecordMeasurement < lastMeasurement -10){
+                                if(!decrease){
+                                    decrease = true;
+                                } else {
+                                    triggerAlert(new Alert(patient.getPatientId(), "Decreasing Trend Alert", currentRecord.getTimestamp()));
+                                    break;
+                                }
+                            }
+
+                            else if (currentRecordMeasurement > lastMeasurement +10){
+                                if(!increase){
+                                    increase = true;
+                                } else {
+                                    triggerAlert(new Alert(patient.getPatientId(), "Increasing Trend Alert", currentRecord.getTimestamp()));
+                                    break;
+                                }
+                            }
+
+                            else{ break;}
+
+                            lastMeasurement = currentRecordMeasurement;
+                        }
+                    }
+                    break;
+
+                case "Saturation":
+                    saturationTooLow = false;
+
+                    if(measurement < 92){
+                        if(systolicPressureTooLow){
+                            triggerAlert(new Alert(patient.getPatientId(), "Hypotensive Hypoxemia Alert", record.getTimestamp()));
+                        } else{
+                            triggerAlert(new Alert(patient.getPatientId(), "Critical Treshold Alert: Blood Saturation too low", record.getTimestamp()));
+                        }
+                        saturationTooLow = true;
+                    }
+
+                    long timestamp = record.getTimestamp();
+                    PatientRecord currentRecord = record;
+                    int t;
+
+                    for(t = i+1; t < patientRecord.size() && currentRecord.getTimestamp() <= timestamp + (10*60*1000); t++){
+                        if(patientRecord.get(t).getMeasurementValue() <= measurement -5){
+                            triggerAlert(new Alert(patient.getPatientId(), "Decreasing Trend Alert", patientRecord.get(t).getTimestamp()));
+                            break;
+                        }
+                        currentRecord = patientRecord.get(t);
+                    }
+
+                    
+
+            }
+        }
+        
     }
 
     /**

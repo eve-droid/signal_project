@@ -24,6 +24,10 @@ public class Patient {
         this.patientRecords = new ArrayList<>();
     }
 
+    public String getPatientId(){
+        return Integer.toString(patientId);
+    }
+
     /**
      * Adds a new record to this patient's list of medical records.
      * The record is created with the specified measurement value, record type, and
@@ -49,9 +53,16 @@ public class Patient {
      *                  epoch
      * @param endTime   the end of the time range, in milliseconds since UNIX epoch
      * @return a list of PatientRecord objects that fall within the specified time
-     *         range
+     
+
+    public String getPatientId() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getPatientId'");
+    }*         range
      */
     public List<PatientRecord> getRecords(long startTime, long endTime) {
         // TODO Implement and test this method
+        List<PatientRecord> record = new ArrayList<>();
+        return record;
     }
 }

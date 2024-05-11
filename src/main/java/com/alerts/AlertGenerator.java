@@ -20,6 +20,8 @@ import com.data_management.PatientRecord;
  */
 public class AlertGenerator {
     private DataStorage dataStorage;
+    private AlertStorage alertStorage = new AlertStorage();
+    private AlertManager alertManager = new AlertManager(alertStorage);
 
     /**
      * Constructs an {@code AlertGenerator} with a specified {@code DataStorage}.
@@ -47,8 +49,8 @@ public class AlertGenerator {
     public void evaluateData(Patient patient) {
 
         String patientId = patient.getPatientId();
-        List<PatientRecord> patientRecord = dataStorage.getRecords(Integer.parseInt(patientId), 0, 20000); //not sure of the endtime
-
+        List<PatientRecord> patientRecord = dataStorage.getRecords(Integer.parseInt(patientId), 0, 2000000000000L); //not sure of the endtime   
+        System.out.println("test");
         boolean decreaseInDP = false; //keeps track if the last two diastolic measurements showed a decrease
         boolean increaseInDP = false; //keeps track if the last two diastolic measurements showed an increase
         double lastDiastolicPressure = -1; //keeps track of the last diastolic measurement
@@ -68,29 +70,34 @@ public class AlertGenerator {
             switch (record.getRecordType()){
 
                 case "DiastolicPressure": 
+
+                    //Treshold check
                     if (measurement < 60){
                         triggerAlert(new Alert(patientId, "Critical Treshold Alert: Diastolic Pressure to low", record.getTimestamp()));
                     } else if(measurement > 120){
                         triggerAlert(new Alert(patientId, "Critical Treshold Alert: Diastolic Pressure to high", record.getTimestamp()));
                     }
 
-                    
+                    //verify if there is a decrease/increase in the measurements
+                    //if there already was a decrease/increase reported, then it is considered a trend and an alert is triggered
                     if((measurement < lastDiastolicPressure -10) && lastDiastolicPressure > 0){
                         if(!decreaseInDP){
                             decreaseInDP = true;
+                            increaseInDP = false;
                         } else {
                             triggerAlert(new Alert(patientId, "Decreasing Trend Alert", record.getTimestamp()));
-                            break;
                         }
                     }
-
                     else if ((measurement > lastDiastolicPressure +10) && lastDiastolicPressure > 0){
                         if(!increaseInDP){
                             increaseInDP = true;
+                            decreaseInDP = false;
                         } else {
                             triggerAlert(new Alert(patientId, "Increasing Trend Alert", record.getTimestamp()));
-                            break;
                         }
+                    } else{
+                        increaseInDP = false;
+                        decreaseInDP = false;
                     }
                     lastDiastolicPressure = measurement;
                     
@@ -98,8 +105,10 @@ public class AlertGenerator {
 
                 case "SystolicPressure" : 
                     systolicPressureTooLow = false;
+
+                    //Treshold check
                     if (measurement < 90){
-                        if(saturationTooLow){
+                        if(saturationTooLow){//if a low saturation is combined with a low systolic pressure, it's a hypotensive hypoxemia alert
                             triggerAlert(new Alert(patientId, "Critical Treshold Alert: Hypotensive Hypoxemia Alert", record.getTimestamp()));
                         } else {
                             triggerAlert(new Alert(patientId, "Critical Treshold Alert: Systolic pressure too low", record.getTimestamp()));
@@ -110,22 +119,26 @@ public class AlertGenerator {
                         triggerAlert(new Alert(patientId, "Critical Treshold Alert: Systolic pressure too high", record.getTimestamp()));
                     }
 
+                    //verify if there is a decrease/increase in the measurements
+                    //if there already was a decrease/increase reported, then it is considered a trend and an alert is triggered
                     if(measurement < lastSystolicPressure -10){
                         if(!decreaseInSP){
                             decreaseInSP = true;
+                            increaseInSP = false;
                         } else {
                             triggerAlert(new Alert(patientId, "Decreasing Trend Alert", record.getTimestamp()));
-                            break;
                         }
                     }
-
                     else if (measurement > lastSystolicPressure +10){
                         if(!increaseInSP){
                             increaseInSP = true;
+                            decreaseInSP = false;
                         } else {
                             triggerAlert(new Alert(patientId, "Increasing Trend Alert", record.getTimestamp()));
-                            break;
                         }
+                    } else{
+                        increaseInSP = false;
+                        decreaseInSP = false;
                     }
                     lastSystolicPressure = measurement;
                 
@@ -134,8 +147,9 @@ public class AlertGenerator {
                 case "Saturation":
                     saturationTooLow = false;
 
+                    //Treshold check
                     if(measurement < 92){
-                        if(systolicPressureTooLow){
+                        if(systolicPressureTooLow){//if a low saturation is combined with a low systolic pressure, it's a hypotensive hypoxemia alert
                             triggerAlert(new Alert(patientId, "Hypotensive Hypoxemia Alert", record.getTimestamp()));
                         } else{
                             triggerAlert(new Alert(patientId, "Critical Treshold Alert: Blood Saturation too low", record.getTimestamp()));
@@ -144,29 +158,37 @@ public class AlertGenerator {
                     }
 
                     long timestamp = record.getTimestamp();
-                    PatientRecord currentRecord = record;
+                    PatientRecord patiantData = record;
                     int t;
 
-                    for(t = i+1; t < patientRecord.size() && currentRecord.getTimestamp() <= timestamp + (10*60*1000); t++){
-                        if(patientRecord.get(t).getMeasurementValue() <= measurement -5){
-                            triggerAlert(new Alert(patientId, "Decreasing Trend Alert", patientRecord.get(t).getTimestamp()));
+                    //check if the saturation dropped by 5% or more in a window of 10 minutes before the measurement
+                    for(t = i-1; t < patientRecord.size() && patiantData.getTimestamp() <= timestamp - (10*60*1000); t--){
+                        patiantData = patientRecord.get(t);
+                        if((patiantData.getRecordType().equals("Saturation")) && (patiantData.getMeasurementValue() <= measurement +5)){
+                            triggerAlert(new Alert(patientId, "Decreasing Trend Alert", patiantData.getTimestamp()));
                             break;
                         }
-                        currentRecord = patientRecord.get(t);
+    
                     }
                     break;
 
                 case "ECG":
+
+                    //find the next ECG measurement to compute the bpm (60/(RR-intervals))
                     for(int k = i+1; k < patientRecord.size(); k++){
                         if(patientRecord.get(k).getRecordType().equals("ECG")){
-                            double bpm = Math.abs(measurement-patientRecord.get(k).getMeasurementValue());
+                            double bpm = 60/Math.abs(record.getTimestamp()-patientRecord.get(k).getTimestamp());
 
+                            //Treshold check
                             if (bpm < 50){
                                 triggerAlert(new Alert(patientId, "Critical Treshold Alert: Heart Rate to low", record.getTimestamp()));
                             } else if(bpm > 100){
                                 triggerAlert(new Alert(patientId, "Critical Treshold Alert: Heart Rate to high", record.getTimestamp()));
                             }
 
+                            //keeps track of the irregular heart beats
+                            //assumption: irregular is a variability of ten or more from the previous bpm
+                            //if the bpm is not irregular, then the number keeping track of irregular bpm is decremented or stays 0
                             if (lastBpm >= 0 && (bpm <= lastBpm - 10 || bpm >= lastBpm + 10)){
                                 irregularBpm++;
                             }else{
@@ -175,9 +197,9 @@ public class AlertGenerator {
                                 }
                             }
 
+                            //assumption: if the number keeping track of the irregular bpm gets to 5, it is considered a pattern and an alert is triggerred
                             if(irregularBpm >= 5){
                                 triggerAlert(new Alert(patientId, "Trend Alert: Abnormal Heart Rate", record.getTimestamp()));
-                                irregularBpm = 0;
                             }
 
                             lastBpm = measurement;
@@ -202,8 +224,14 @@ public class AlertGenerator {
      */
     public void triggerAlert(Alert alert) {
 
+        alertManager.addAlert(alert); //add the alert to the alert storage via alertManager
         OutputStrategy outputStrategy = new TcpOutputStrategy(3); //not sure what the port number should be
         outputStrategy.output(Integer.parseInt(alert.getPatientId()), alert.getTimestamp(), alert.getCondition(), "triggered");
         // Implementation might involve logging the alert or notifying staff
+    }
+
+
+    public List<Alert> getAlertsPatient(int patientId){
+        return alertManager.getAlertsPatient(patientId);
     }
 }

@@ -1,26 +1,35 @@
 package com.alerts;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class AlertManager {
-    private List<Alert> alertList;
+    protected Map<Integer, List<Alert>> alertMap; // Stores the list of alert objects of each patient indexed by their unique patient ID.
 
     public AlertManager(AlertStorage alertStorage){
-        alertList = alertStorage.getAlerts();
-    }
-
-    public AlertManager(List<Alert> alertList){
-        this.alertList = alertList;
+        alertMap = alertStorage.getAllAlerts();
     }
 
     public void addAlert(Alert alert){
-        alertList.add(alert);
+
+        int patientId = Integer.parseInt(alert.getPatientId());
+        
+        if(alertMap.get(patientId) != null){
+            alertMap.get(Integer.parseInt(alert.getPatientId())).add(alert);
+        } else{
+            List <Alert> list = new ArrayList<>();
+            list.add(alert);
+            alertMap.put(patientId, list);
+        }
     }
     
     public void resolveAlert(Alert alert){
-        for(int i =0; i<alertList.size(); i++){
-            if(sameAlert(alertList.get(i), alert)){
-                alertList.remove(i);
+        int patientId = Integer.parseInt(alert.getPatientId());
+
+        for(int i =0; i<alertMap.get(patientId).size(); i++){
+            if(sameAlert(alertMap.get(patientId).get(i), alert)){
+                alertMap.get(patientId).remove(i);
             }
         }
     } 
@@ -30,5 +39,9 @@ public class AlertManager {
             return true;
         }
         return false;
+    }
+
+    public List<Alert> getAlertsPatient(int patientId){
+        return alertMap.get(patientId);
     }
 }

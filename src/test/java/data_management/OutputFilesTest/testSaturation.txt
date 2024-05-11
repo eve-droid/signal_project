@@ -1,0 +1,10 @@
+Patient ID: 84, Timestamp: 1715250889676, Label: Saturation, Data: 97.0%
+Patient ID: 88, Timestamp: 1715250889676, Label: Saturation, Data: 96.0%
+Patient ID: 95, Timestamp: 1715250889710, Label: Saturation, Data: 95.0%
+Patient ID: 91, Timestamp: 1715250889740, Label: Saturation, Data: 98.0%
+Patient ID: 93, Timestamp: 1715250889697, Label: Saturation, Data: 96.0%
+Patient ID: 67, Timestamp: 1715250889695, Label: Saturation, Data: 99.0%
+Patient ID: 16, Timestamp: 1715250889734, Label: Saturation, Data: 94.0%
+Patient ID: 79, Timestamp: 1715250889703, Label: Saturation, Data: 98.0%
+Patient ID: 92, Timestamp: 1715250889747, Label: Saturation, Data: 100.0%
+Patient ID: 27, Timestamp: 1715250889795, Label: Saturation, Data: 94.0%

@@ -1,6 +1,10 @@
 package com.alerts;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.List;
+import java.util.Scanner;
 
 import com.cardio_generator.outputs.OutputStrategy;
 import com.cardio_generator.outputs.TcpOutputStrategy;
@@ -29,6 +33,7 @@ public class AlertGenerator {
         this.dataStorage = dataStorage;
     }
 
+    
     /**
      * Evaluates the specified patient's data to determine if any alert conditions
      * are met. If a condition is met, an alert is triggered via the
@@ -44,18 +49,21 @@ public class AlertGenerator {
         String patientId = patient.getPatientId();
         List<PatientRecord> patientRecord = dataStorage.getRecords(Integer.parseInt(patientId), 0, 20000); //not sure of the endtime
 
-        boolean systolicPressureTooLow = false;
-        boolean saturationTooLow = false;
-        int irregularBpm = 0;
-        double lastBpm = -1;
+        boolean decreaseInDP = false; //keeps track if the last two diastolic measurements showed a decrease
+        boolean increaseInDP = false; //keeps track if the last two diastolic measurements showed an increase
+        double lastDiastolicPressure = -1; //keeps track of the last diastolic measurement
+        boolean decreaseInSP = false; //keeps track if the last two systolic measurements showed a decrease
+        boolean increaseInSP = false; //keeps track if the last two systolic measurements showed an increase
+        double lastSystolicPressure = -1; //keeps track of the last systolic measurement
+        boolean systolicPressureTooLow = false; //keeps track if the last systolic measurement was too low
+        boolean saturationTooLow = false; //keeps track if the last saturation measurement was too low
+        int irregularBpm = 0; //keeps track of the number of consecutive irregular bpm
+        double lastBpm = -1; //keeps track of the last bpm measurement 
 
         for (int i = 0; i < patientRecord.size(); i++){
 
             PatientRecord record = patientRecord.get(i);
             double measurement = record.getMeasurementValue();
-            double lastMeasurement = measurement;
-            boolean decrease = false;
-            boolean increase = false;
 
             switch (record.getRecordType()){
 
@@ -66,34 +74,26 @@ public class AlertGenerator {
                         triggerAlert(new Alert(patientId, "Critical Treshold Alert: Diastolic Pressure to high", record.getTimestamp()));
                     }
 
-                    for (int t = i+1; t < patientRecord.size(); t++){
-                        PatientRecord currentRecord = patientRecord.get(t);
-                        
-                        if (currentRecord.getRecordType().equals("DiastolicPressure")){
-                            double currentRecordMeasurement = currentRecord.getMeasurementValue();
-                            if(currentRecordMeasurement < lastMeasurement -10){
-                                if(!decrease){
-                                    decrease = true;
-                                } else {
-                                    triggerAlert(new Alert(patientId, "Decreasing Trend Alert", record.getTimestamp()));
-                                    break;
-                                }
-                            }
-
-                            else if (currentRecordMeasurement > lastMeasurement +10){
-                                if(!increase){
-                                    increase = true;
-                                } else {
-                                    triggerAlert(new Alert(patientId, "Increasing Trend Alert", record.getTimestamp()));
-                                    break;
-                                }
-                            }
-
-                            else{ break;}
-
-                            lastMeasurement = currentRecordMeasurement;
+                    
+                    if((measurement < lastDiastolicPressure -10) && lastDiastolicPressure > 0){
+                        if(!decreaseInDP){
+                            decreaseInDP = true;
+                        } else {
+                            triggerAlert(new Alert(patientId, "Decreasing Trend Alert", record.getTimestamp()));
+                            break;
                         }
                     }
+
+                    else if ((measurement > lastDiastolicPressure +10) && lastDiastolicPressure > 0){
+                        if(!increaseInDP){
+                            increaseInDP = true;
+                        } else {
+                            triggerAlert(new Alert(patientId, "Increasing Trend Alert", record.getTimestamp()));
+                            break;
+                        }
+                    }
+                    lastDiastolicPressure = measurement;
+                    
                     break;
 
                 case "SystolicPressure" : 
@@ -110,34 +110,25 @@ public class AlertGenerator {
                         triggerAlert(new Alert(patientId, "Critical Treshold Alert: Systolic pressure too high", record.getTimestamp()));
                     }
 
-                    for (int t = i+1; t < patientRecord.size(); t++){
-                        PatientRecord currentRecord = patientRecord.get(t);
-                        
-                        if (currentRecord.getRecordType().equals("DiastolicPressure")){
-                            double currentRecordMeasurement = currentRecord.getMeasurementValue();
-                            if(currentRecordMeasurement < lastMeasurement -10){
-                                if(!decrease){
-                                    decrease = true;
-                                } else {
-                                    triggerAlert(new Alert(patientId, "Decreasing Trend Alert", currentRecord.getTimestamp()));
-                                    break;
-                                }
-                            }
-
-                            else if (currentRecordMeasurement > lastMeasurement +10){
-                                if(!increase){
-                                    increase = true;
-                                } else {
-                                    triggerAlert(new Alert(patientId, "Increasing Trend Alert", currentRecord.getTimestamp()));
-                                    break;
-                                }
-                            }
-
-                            else{ break;}
-
-                            lastMeasurement = currentRecordMeasurement;
+                    if(measurement < lastSystolicPressure -10){
+                        if(!decreaseInSP){
+                            decreaseInSP = true;
+                        } else {
+                            triggerAlert(new Alert(patientId, "Decreasing Trend Alert", record.getTimestamp()));
+                            break;
                         }
                     }
+
+                    else if (measurement > lastSystolicPressure +10){
+                        if(!increaseInSP){
+                            increaseInSP = true;
+                        } else {
+                            triggerAlert(new Alert(patientId, "Increasing Trend Alert", record.getTimestamp()));
+                            break;
+                        }
+                    }
+                    lastSystolicPressure = measurement;
+                
                     break;
 
                 case "Saturation":

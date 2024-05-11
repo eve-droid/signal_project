@@ -24,6 +24,11 @@ public class Patient {
         this.patientRecords = new ArrayList<>();
     }
 
+    /**
+     * get the Patient identification
+     * 
+     * @return the patient ID as a string
+     */
     public String getPatientId(){
         return Integer.toString(patientId);
     }

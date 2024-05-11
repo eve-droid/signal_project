@@ -23,6 +23,10 @@ public class DataStorage {
         this.patientMap = new HashMap<>();
     }
 
+    public DataStorage(DataReader reader) {
+        //TODO Auto-generated constructor stub
+    }
+
     /**
      * Adds or updates patient data in the storage.
      * If the patient does not exist, a new Patient object is created and added to
@@ -66,6 +70,29 @@ public class DataStorage {
         return new ArrayList<>(); // return an empty list if no patient is found
     }
 
+    public PatientRecord getRecord(int patientId, long Timestamp) {
+        Patient patient = patientMap.get(patientId);
+        if (patient != null) {
+            List<PatientRecord> patientRecord = patient.getRecords(Timestamp, Timestamp);
+            return patientRecord.get(0);
+        }
+        return new PatientRecord(); // return an empty patientRecord if no patient is found
+    }
+
+    /**
+     * Compute the total number of records stored in the datastorage
+     * 
+     * @return total number of records
+     */
+    public int totalNumberOfRecord(){
+        int count = 0;
+        for(Patient patient: patientMap.values()){
+            List<PatientRecord> records = patient.getRecords(0, Long.MAX_VALUE);
+            count += records.size();
+        }
+
+        return count;
+    }
     /**
      * Retrieves a collection of all patients stored in the data storage.
      *

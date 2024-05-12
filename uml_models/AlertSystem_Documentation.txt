@@ -1,0 +1,4 @@
+The UML class diagram represents a health monitoring system’s alert hierarchy. The Alert superclass provides a foundational triggerAlert method, inherited by all alerts. 
+Subclasses like BloodPressureAlert, ECGAlert, HypotensiveHypoxemiaAlert, and BloodSaturationAlert each have specific attributes to monitor vital signs and a checkAlert method to validate when an alert should be issued.
+ These subclasses extend the Alert class, indicating a relationship where they specialize the general alert behavior to their respective health metrics. 
+The arrows symbolize this inheritance, showing a structured approach to organizing alert types in the system.

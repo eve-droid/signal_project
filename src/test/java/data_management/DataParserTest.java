@@ -4,11 +4,13 @@ import static org.junit.Assert.assertEquals;
 
 
 import java.io.IOException;
+import java.util.List;
 
 import org.junit.Test;
 
 import com.data_management.DataParser;
 import com.data_management.DataStorage;
+import com.data_management.PatientRecord;
 
 public class DataParserTest {
     
@@ -28,6 +30,10 @@ public class DataParserTest {
 
         assertEquals(65, numberOfRecords); //check the number of records
 
+        List<PatientRecord> records = dataStorage.getRecords(51, 1700000000000L, 1800000000000L);
+
+        assertEquals(1715250889818L, records.get(0).getTimestamp());
+
         assertEquals(72.0, (dataStorage.getRecord(51, 1715250889818L)).getMeasurementValue(), 0.0);//check DiastolicPressure
 
         assertEquals(0.036438017312799664, (dataStorage.getRecord(14, 1715250889700L)).getMeasurementValue(), 0.0);//check ECG positive value
@@ -36,6 +42,18 @@ public class DataParserTest {
         assertEquals(97.0, (dataStorage.getRecord(84, 1715250889676L)).getMeasurementValue(), 0.0);//check saturation
 
         assertEquals(120.0, (dataStorage.getRecord(39, 1715250889750L)).getMeasurementValue(), 0.0);//check SystolicPressure
+    }
+
+    @Test
+    public void emptyAndWrongDirectoryTest() throws IOException{
+        DataParser parser = new DataParser();
+        DataStorage dataStorage = new DataStorage();
+        parser.readData(dataStorage);
+
+        parser.parseData("src/test/java/data_management/OutputFilesTest/EmptyDirectory"); //empty directory
+        parser.parseData("src/test/java/data_management/OutputFilesTest/DoesNotExist"); //directory that doesn't exist
+        parser.parseData("src/test/java/data_management/OutputFilesTest/wrongInputTest"); //data is not a double but is "low", so wrong input
+        parser.parseData("src/test/java/data_management/OutputFilesTest/emptyFile"); //empty file
     }
 
     /*public static void main (String[] args){

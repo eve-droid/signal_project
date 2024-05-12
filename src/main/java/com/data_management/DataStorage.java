@@ -23,9 +23,6 @@ public class DataStorage {
         this.patientMap = new HashMap<>();
     }
 
-    public DataStorage(DataReader reader) {
-        //TODO Auto-generated constructor stub
-    }
 
     /**
      * Adds or updates patient data in the storage.
@@ -76,7 +73,7 @@ public class DataStorage {
             List<PatientRecord> patientRecord = patient.getRecords(Timestamp, Timestamp);
             return patientRecord.get(0);
         }
-        return new PatientRecord(); // return an empty patientRecord if no patient is found
+        return null; // return an empty patientRecord if no patient is found
     }
 
     /**
@@ -109,7 +106,7 @@ public class DataStorage {
      * 
      * @param args command line arguments
      */
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         // DataReader is not defined in this scope, should be initialized appropriately.
         // DataReader reader = new SomeDataReaderImplementation("path/to/data");
         DataStorage storage = new DataStorage();
@@ -134,5 +131,5 @@ public class DataStorage {
         for (Patient patient : storage.getAllPatients()) {
             alertGenerator.evaluateData(patient);
         }
-    }
+    }*/
 }

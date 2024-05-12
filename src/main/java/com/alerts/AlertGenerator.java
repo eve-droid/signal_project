@@ -8,6 +8,7 @@ import java.util.Scanner;
 
 import com.cardio_generator.outputs.OutputStrategy;
 import com.cardio_generator.outputs.TcpOutputStrategy;
+import com.data_management.DataParser;
 import com.data_management.DataStorage;
 import com.data_management.Patient;
 import com.data_management.PatientRecord;
@@ -48,9 +49,16 @@ public class AlertGenerator {
      */
     public void evaluateData(Patient patient) {
 
+        /**
+         * message to the person giving feedback:
+         * we used only one method to take care of all the condition for a matter of efficiency that seems crucial in this system alert,
+         * However, it kinda goes against the SOLID principles.
+         * Would you recommend us to keep this method that way or should we create distinct methods, perhaps classes, to take care of the 
+         * alert conditions?
+         */
+
         String patientId = patient.getPatientId();
         List<PatientRecord> patientRecord = dataStorage.getRecords(Integer.parseInt(patientId), 0, 2000000000000L); //not sure of the endtime   
-        System.out.println("test");
         boolean decreaseInDP = false; //keeps track if the last two diastolic measurements showed a decrease
         boolean increaseInDP = false; //keeps track if the last two diastolic measurements showed an increase
         double lastDiastolicPressure = -1; //keeps track of the last diastolic measurement
@@ -80,7 +88,7 @@ public class AlertGenerator {
 
                     //verify if there is a decrease/increase in the measurements
                     //if there already was a decrease/increase reported, then it is considered a trend and an alert is triggered
-                    if((measurement < lastDiastolicPressure -10) && lastDiastolicPressure > 0){
+                    if(measurement < lastDiastolicPressure -10 && lastDiastolicPressure > 0){
                         if(!decreaseInDP){
                             decreaseInDP = true;
                             increaseInDP = false;
@@ -88,7 +96,7 @@ public class AlertGenerator {
                             triggerAlert(new Alert(patientId, "Decreasing Trend Alert", record.getTimestamp()));
                         }
                     }
-                    else if ((measurement > lastDiastolicPressure +10) && lastDiastolicPressure > 0){
+                    else if (measurement > lastDiastolicPressure +10 && lastDiastolicPressure > 0){
                         if(!increaseInDP){
                             increaseInDP = true;
                             decreaseInDP = false;
@@ -121,7 +129,7 @@ public class AlertGenerator {
 
                     //verify if there is a decrease/increase in the measurements
                     //if there already was a decrease/increase reported, then it is considered a trend and an alert is triggered
-                    if(measurement < lastSystolicPressure -10){
+                    if(measurement < lastSystolicPressure -10 && lastSystolicPressure > 0){
                         if(!decreaseInSP){
                             decreaseInSP = true;
                             increaseInSP = false;
@@ -129,7 +137,7 @@ public class AlertGenerator {
                             triggerAlert(new Alert(patientId, "Decreasing Trend Alert", record.getTimestamp()));
                         }
                     }
-                    else if (measurement > lastSystolicPressure +10){
+                    else if (measurement > lastSystolicPressure +10 && lastSystolicPressure > 0){
                         if(!increaseInSP){
                             increaseInSP = true;
                             decreaseInSP = false;
@@ -162,9 +170,9 @@ public class AlertGenerator {
                     int t;
 
                     //check if the saturation dropped by 5% or more in a window of 10 minutes before the measurement
-                    for(t = i-1; t < patientRecord.size() && patiantData.getTimestamp() <= timestamp - (10*60*1000); t--){
+                    for(t = i-1; t >= 0 && patiantData.getTimestamp() >= timestamp - (10*60*1000); t--){
                         patiantData = patientRecord.get(t);
-                        if((patiantData.getRecordType().equals("Saturation")) && (patiantData.getMeasurementValue() <= measurement +5)){
+                        if((patiantData.getRecordType().equals("Saturation")) && (patiantData.getMeasurementValue() >= measurement +5)){
                             triggerAlert(new Alert(patientId, "Decreasing Trend Alert", patiantData.getTimestamp()));
                             break;
                         }
@@ -177,13 +185,13 @@ public class AlertGenerator {
                     //find the next ECG measurement to compute the bpm (60/(RR-intervals))
                     for(int k = i+1; k < patientRecord.size(); k++){
                         if(patientRecord.get(k).getRecordType().equals("ECG")){
-                            double bpm = 60/Math.abs(record.getTimestamp()-patientRecord.get(k).getTimestamp());
+                        double bpm = (60.0/Math.abs(record.getTimestamp()-patientRecord.get(k).getTimestamp())) * 1000;
 
-                            //Treshold check
+                        //Treshold check
                             if (bpm < 50){
-                                triggerAlert(new Alert(patientId, "Critical Treshold Alert: Heart Rate to low", record.getTimestamp()));
+                                triggerAlert(new Alert(patientId, "Critical Treshold Alert: Heart Rate to low", patientRecord.get(k).getTimestamp()));
                             } else if(bpm > 100){
-                                triggerAlert(new Alert(patientId, "Critical Treshold Alert: Heart Rate to high", record.getTimestamp()));
+                                triggerAlert(new Alert(patientId, "Critical Treshold Alert: Heart Rate to high", patientRecord.get(k).getTimestamp()));
                             }
 
                             //keeps track of the irregular heart beats
@@ -199,10 +207,10 @@ public class AlertGenerator {
 
                             //assumption: if the number keeping track of the irregular bpm gets to 5, it is considered a pattern and an alert is triggerred
                             if(irregularBpm >= 5){
-                                triggerAlert(new Alert(patientId, "Trend Alert: Abnormal Heart Rate", record.getTimestamp()));
+                                triggerAlert(new Alert(patientId, "Trend Alert: Abnormal Heart Rate", patientRecord.get(k).getTimestamp()));
                             }
 
-                            lastBpm = measurement;
+                            lastBpm = bpm;
                             break;
                         }
                     }
@@ -224,9 +232,10 @@ public class AlertGenerator {
      */
     public void triggerAlert(Alert alert) {
 
+        System.out.println(alert.getCondition());
         alertManager.addAlert(alert); //add the alert to the alert storage via alertManager
-        OutputStrategy outputStrategy = new TcpOutputStrategy(3); //not sure what the port number should be
-        outputStrategy.output(Integer.parseInt(alert.getPatientId()), alert.getTimestamp(), alert.getCondition(), "triggered");
+        //OutputStrategy outputStrategy = new TcpOutputStrategy(3); //not sure what the port number should be
+        //outputStrategy.output(Integer.parseInt(alert.getPatientId()), alert.getTimestamp(), alert.getCondition(), "triggered");
         // Implementation might involve logging the alert or notifying staff
     }
 
@@ -234,4 +243,5 @@ public class AlertGenerator {
     public List<Alert> getAlertsPatient(int patientId){
         return alertManager.getAlertsPatient(patientId);
     }
+
 }

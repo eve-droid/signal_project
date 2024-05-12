@@ -16,3 +16,11 @@ Patient ID: 7, Timestamp: 1715250890835, Label: Saturation, Data: 84.0
 Patient ID: 7, Timestamp: 1715250890935, Label: ECG, Data: 0.035729735
 Patient ID: 7, Timestamp: 1715250891500, Label: ECG, Data: 0.309273
 Patient ID: 7, Timestamp: 1715250892750, Label: ECG, Data: 0.408271
+Patient ID: 7, Timestamp: 1715250893750, Label: ECG, Data: 0.408271
+Patient ID: 7, Timestamp: 1715250894430, Label: ECG, Data: 0.408271
+Patient ID: 7, Timestamp: 1715250895100, Label: ECG, Data: 0.408271
+Patient ID: 7, Timestamp: 1715250895930, Label: ECG, Data: 0.408271
+Patient ID: 7, Timestamp: 1715250896600, Label: ECG, Data: 0.408271
+Patient ID: 7, Timestamp: 1715250897600, Label: ECG, Data: 0.408271
+Patient ID: 7, Timestamp: 1715251590835, Label: Saturation, Data: 75.0
+Patient ID: 7, Timestamp: 1715251590845, Label: Saturation, Data: 94.0

@@ -8,9 +8,8 @@ import java.util.Map;
 
 /**
  * Stores all the current triggered alerts of the sytsem
- * 
- * it extends AlertManager class to facilitate  
- */
+ *
+ *  */
 public class AlertStorage{
     protected Map<Integer, List<Alert>> alertMap; // Stores the list of alert objects of each patient indexed by their unique patient ID.
 
@@ -22,6 +21,11 @@ public class AlertStorage{
         this.alertMap = new HashMap<>();
     }
 
+    /**
+     * get and return all the alerts stored
+     * 
+     * @return the map of the lists of alerts 
+     */
     protected Map<Integer, List<Alert>> getAllAlerts(){
         return alertMap;
     }

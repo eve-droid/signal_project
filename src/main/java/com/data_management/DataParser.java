@@ -28,38 +28,36 @@ public class DataParser implements DataReader{
         try{
             File file = new File(output_dir);
 
-            if(file != null){
+            try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+                String line;
 
-                try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-                    String line;
+                while ((line = reader.readLine()) != null) {
 
-                    while ((line = reader.readLine()) != null) {
+                    String[] lineSplit = line.split(",");
 
-                        String[] lineSplit = line.split(",");
-
-                        for(int i =0; i<lineSplit.length; i++){
-                            String [] onlyData = lineSplit[i].split(":");
-                            lineSplit[i] = onlyData[1];
-                        }
-
-                        //assumption: each line of the files has the patient number, the timestamp, the type of measurement (label) and the measurement value in this order separated by a comma
-                        int patientID = Integer.parseInt(lineSplit[0].trim());
-                        long timestamp = Long.parseLong(lineSplit[1].trim());
-                        String recordType = lineSplit[2].trim(); //e.g. ECG, blood pressure
-                        double data;
-                        if(recordType.equals("Saturation")){
-                            String[] dataString = lineSplit[3].split("%");
-                            data = Double.parseDouble(dataString[0].trim());
-                        } else{
-                            data = Double.parseDouble(lineSplit[3].trim()); //measurement value
-                        }
-                        
-
-                        dataStorage.addPatientData(patientID, data, recordType, timestamp); // pass the line read to the data storage
+                    for(int i =0; i<lineSplit.length; i++){
+                        String [] onlyData = lineSplit[i].split(":");
+                        lineSplit[i] = onlyData[1];
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
+
+                    //assumption: each line of the files has the patient number, the timestamp, the type of measurement (label) and the measurement value in this order separated by a comma
+                    int patientID = Integer.parseInt(lineSplit[0].trim());
+                    long timestamp = Long.parseLong(lineSplit[1].trim());
+                    String recordType = lineSplit[2].trim(); //e.g. ECG, blood pressure
+                    double data;
+                    if(recordType.equals("Saturation")){
+                        String[] dataString = lineSplit[3].split("%");
+                        data = Double.parseDouble(dataString[0].trim());
+                    } else{
+                        data = Double.parseDouble(lineSplit[3].trim()); //measurement value
+                    }
+                    
+
+                    dataStorage.addPatientData(patientID, data, recordType, timestamp); // pass the line read to the data storage
                 }
+            } catch (IOException e) {
+                e.printStackTrace();
+                    
             }
         }catch (Exception e){
             e.printStackTrace();

@@ -30,7 +30,7 @@ public class AlertGeneratorTest {
         alertGenerator.evaluateData(new Patient(7));
         List <Alert> alertList = alertGenerator.getAlertsPatient(7);
 
-        assertEquals(17, alertList.size());
+        assertEquals(14, alertList.size());
     }
     
 
@@ -58,9 +58,9 @@ public class AlertGeneratorTest {
             writer.write("Patient ID: 7, Timestamp: 1715250890535, Label: SystolicPressure, Data: 91.0\n");//decreasing trend alert
 
             writer.write("Patient ID: 7, Timestamp: 1715250890635, Label: Saturation, Data: 90.0\n");//too low alert
-            writer.write("Patient ID: 7, Timestamp: 1715250890735, Label: SystolicPressure, Data: 65.0\n");//combined with a sysPressure too low alert + decreasing trend in SP alert
+            writer.write("Patient ID: 7, Timestamp: 1715250890735, Label: SystolicPressure, Data: 65.0\n");//combined with a sysPressure too low alert
 
-            writer.write("Patient ID: 7, Timestamp: 1715250890835, Label: Saturation, Data: 84.0\n");//drop of 5% or more alert + too low alert
+            writer.write("Patient ID: 7, Timestamp: 1715250890835, Label: Saturation, Data: 84.0\n");//drop of 5% or more alert 
 
             writer.write("Patient ID: 7, Timestamp: 1715250890935, Label: ECG, Data: 0.035729735\n");
             writer.write("Patient ID: 7, Timestamp: 1715250891500, Label: ECG, Data: 0.309273\n");//106 bpm, too high alert

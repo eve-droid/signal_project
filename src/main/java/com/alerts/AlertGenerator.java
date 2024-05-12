@@ -93,7 +93,7 @@ public class AlertGenerator {
                             decreaseInDP = true;
                             increaseInDP = false;
                         } else {
-                            triggerAlert(new Alert(patientId, "Decreasing Trend Alert", record.getTimestamp()));
+                            triggerAlert(new Alert(patientId, "Decreasing Trend Alert in Diastolic Pressure", record.getTimestamp()));
                         }
                     }
                     else if (measurement > lastDiastolicPressure +10 && lastDiastolicPressure > 0){
@@ -101,7 +101,7 @@ public class AlertGenerator {
                             increaseInDP = true;
                             decreaseInDP = false;
                         } else {
-                            triggerAlert(new Alert(patientId, "Increasing Trend Alert", record.getTimestamp()));
+                            triggerAlert(new Alert(patientId, "Increasing Trend Alert in Diastolic Pressure", record.getTimestamp()));
                         }
                     } else{
                         increaseInDP = false;
@@ -134,7 +134,7 @@ public class AlertGenerator {
                             decreaseInSP = true;
                             increaseInSP = false;
                         } else {
-                            triggerAlert(new Alert(patientId, "Decreasing Trend Alert", record.getTimestamp()));
+                            triggerAlert(new Alert(patientId, "Decreasing Trend Alert in Systolic pressure", record.getTimestamp()));
                         }
                     }
                     else if (measurement > lastSystolicPressure +10 && lastSystolicPressure > 0){
@@ -142,7 +142,7 @@ public class AlertGenerator {
                             increaseInSP = true;
                             decreaseInSP = false;
                         } else {
-                            triggerAlert(new Alert(patientId, "Increasing Trend Alert", record.getTimestamp()));
+                            triggerAlert(new Alert(patientId, "Increasing Trend Alert in Systolic pressure", record.getTimestamp()));
                         }
                     } else{
                         increaseInSP = false;
@@ -158,7 +158,7 @@ public class AlertGenerator {
                     //Treshold check
                     if(measurement < 92){
                         if(systolicPressureTooLow){//if a low saturation is combined with a low systolic pressure, it's a hypotensive hypoxemia alert
-                            triggerAlert(new Alert(patientId, "Hypotensive Hypoxemia Alert", record.getTimestamp()));
+                            triggerAlert(new Alert(patientId, "Critical Treshold Alert: Hypotensive Hypoxemia Alert", record.getTimestamp()));
                         } else{
                             triggerAlert(new Alert(patientId, "Critical Treshold Alert: Blood Saturation too low", record.getTimestamp()));
                         }
@@ -173,7 +173,7 @@ public class AlertGenerator {
                     for(t = i-1; t >= 0 && patiantData.getTimestamp() >= timestamp - (10*60*1000); t--){
                         patiantData = patientRecord.get(t);
                         if((patiantData.getRecordType().equals("Saturation")) && (patiantData.getMeasurementValue() >= measurement +5)){
-                            triggerAlert(new Alert(patientId, "Decreasing Trend Alert", patiantData.getTimestamp()));
+                            triggerAlert(new Alert(patientId, "Decreasing Trend Alert in Saturation", patiantData.getTimestamp()));
                             break;
                         }
     

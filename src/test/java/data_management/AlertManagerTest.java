@@ -31,5 +31,14 @@ public class AlertManagerTest {
 
         assertEquals(1, alertList.size());
 
+        Alert alert3 = new Alert("3", "High Saturation", 1715250800001L);
+        Alert alert4 = new Alert("1", "High Diastolic Pressure", 1715250800001L);
+
+        manager.resolveAlert(alert3);
+        manager.resolveAlert(alert4);
+
+        assertEquals(1, alertList.size());
+
+
     }
 }

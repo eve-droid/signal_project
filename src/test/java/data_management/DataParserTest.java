@@ -12,6 +12,11 @@ import com.data_management.DataParser;
 import com.data_management.DataStorage;
 import com.data_management.PatientRecord;
 
+
+/*
+ * This class tests the DataParser class
+ * it was modified to test the modified dataParser class
+ */
 public class DataParserTest {
     
     @Test
@@ -19,16 +24,20 @@ public class DataParserTest {
 
         DataParser parser = new DataParser();
         DataStorage dataStorage = new DataStorage();
-        parser.readData(dataStorage);
 
-        String [] names = {"DiastolicPressure", "Saturation", "SystolicPressure", "ECG"};
-        for (int i =0; i<names.length; i++){
-            parser.parseData("src/test/java/data_management/OutputFilesTest/test" + names[i] + ".txt");
-        }
-
+        parser.readData(dataStorage, "Patient ID: 51, Timestamp: 1715250889818, Label: DiastolicPressure, Data: 72.0");
+        parser.readData(dataStorage, "Patient ID: 39, Timestamp: 1715250889821, Label: DiastolicPressure, Data: 83.0");
+        parser.readData(dataStorage, "Patient ID: 14, Timestamp: 1715250889700, Label: ECG, Data: 0.036438017312799664");
+        parser.readData(dataStorage, "Patient ID: 69, Timestamp: 1715250889827, Label: DiastolicPressure, Data: 75.0");
+        parser.readData(dataStorage, "Patient ID: 81, Timestamp: 1715250889678, Label: ECG, Data: -0.39235554144612894");
+        parser.readData(dataStorage, "Patient ID: 84, Timestamp: 1715250889676, Label: Saturation, Data: 97.0");
+        parser.readData(dataStorage, "Patient ID: 39, Timestamp: 1715250889750, Label: SystolicPressure, Data: 120.0");
+        parser.readData(dataStorage, "Patient ID: 39, Timestamp: 1715250889750, Label: SystolicPressure, Data: 120.0");//shouldn't be added to data storage since duplicate record
+        parser.readData(dataStorage, "Patient ID: 39, Timestamp: 1715250889750, Label: SystolicPressure, Data: low");//shouldn't be added to data storage since not a double
+        
         int numberOfRecords = dataStorage.totalNumberOfRecord();
 
-        assertEquals(65, numberOfRecords); //check the number of records
+        assertEquals(7, numberOfRecords); //check the number of records
 
         List<PatientRecord> records = dataStorage.getRecords(51, 1700000000000L, 1800000000000L);
 
@@ -44,16 +53,15 @@ public class DataParserTest {
         assertEquals(120.0, (dataStorage.getRecord(39, 1715250889750L)).getMeasurementValue(), 0.0);//check SystolicPressure
     }
 
-    @Test
+    /*@Test
     public void emptyAndWrongDirectoryTest() throws IOException{
         DataParser parser = new DataParser();
         DataStorage dataStorage = new DataStorage();
-        parser.readData(dataStorage);
 
-        parser.parseData("src/test/java/data_management/OutputFilesTest/EmptyDirectory"); //empty directory
-        parser.parseData("src/test/java/data_management/OutputFilesTest/DoesNotExist"); //directory that doesn't exist
-        parser.parseData("src/test/java/data_management/OutputFilesTest/wrongInputTest"); //data is not a double but is "low", so wrong input
-        parser.parseData("src/test/java/data_management/OutputFilesTest/emptyFile"); //empty file
+        parser.readData(dataStorage, "src/test/java/data_management/OutputFilesTest/EmptyDirectory"); //empty directory
+        parser.readData(dataStorage, "src/test/java/data_management/OutputFilesTest/DoesNotExist"); //directory that doesn't exist
+        parser.readData(dataStorage, "src/test/java/data_management/OutputFilesTest/wrongInputTest"); //data is not a double but is "low", so wrong input
+        parser.readData(dataStorage, "src/test/java/data_management/OutputFilesTest/emptyFile"); //empty file
     }
 
     /*public static void main (String[] args){

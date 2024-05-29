@@ -4,10 +4,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import javax.swing.JButton;
-
 import com.alerts.Alert;
-import com.alerts.AlertGenerator;
+import com.alerts.AlertManager;
 import com.cardio_generator.generators.AlertGenerator2;
 
 import com.cardio_generator.generators.BloodPressureDataGenerator;
@@ -19,7 +17,6 @@ import com.cardio_generator.outputs.FileOutputStrategy;
 import com.cardio_generator.outputs.OutputStrategy;
 import com.cardio_generator.outputs.TcpOutputStrategy;
 import com.cardio_generator.outputs.WebSocketOutputStrategy;
-import com.data_management.DataStorage;
 import com.data_management.Patient;
 
 import java.util.Collections;
@@ -29,6 +26,7 @@ import java.awt.Button;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -49,8 +47,9 @@ public class HealthDataSimulator {
      * 
      * @param args command line arguments
      * @throws IOException if there's a IO error
+     * @throws URISyntaxException 
      */
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, URISyntaxException {
 
         parseArguments(args);
 
@@ -67,8 +66,9 @@ public class HealthDataSimulator {
      * 
      * @param args command line arguments
      * @throws IOException if there's an IO error
+     * @throws URISyntaxException 
      */
-    private static void parseArguments(String[] args) throws IOException {
+    private static void parseArguments(String[] args) throws IOException, URISyntaxException {
         for (int i = 0; i < args.length; i++) {
             switch (args[i]) {
                 case "-h":
@@ -202,8 +202,8 @@ public class HealthDataSimulator {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // Emit an event to indicate that a triggered alert should be generated
-                AlertGenerator alertGenerator = new AlertGenerator(new DataStorage());
-                alertGenerator.triggerAlert(new Alert(patient.getPatientId(), "Manual alert for patient " + patient.getPatientId(), System.currentTimeMillis()));;
+                AlertManager alertManager = new AlertManager();
+                alertManager.triggerAlert(new Alert(patient.getPatientId(), "Manual alert for patient " + patient.getPatientId(), System.currentTimeMillis()));;
             }
 
             

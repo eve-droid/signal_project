@@ -8,14 +8,14 @@ import org.junit.Test;
 
 import com.alerts.Alert;
 import com.alerts.AlertManager;
-import com.alerts.AlertStorage;
+
 
 public class AlertManagerTest {
     
     @Test
     public void testAddAndResolveAlert(){
 
-        AlertManager manager = new AlertManager(new AlertStorage());
+        AlertManager manager = new AlertManager();
 
         Alert alert1 = new Alert("1", "High Heart Rate", 1715250800000L);
         Alert alert2 = new Alert("1", "High Saturation", 1715250800001L);

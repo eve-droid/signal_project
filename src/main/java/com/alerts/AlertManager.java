@@ -4,19 +4,43 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+
+import com.data_management.DataStorage;
+import com.data_management.Patient;
+
 /**
  * This class manages all the alerts (e.g. adding a new alert, deleting one)
  */
 public class AlertManager {
     protected Map<Integer, List<Alert>> alertMap; // Stores the list of alert objects of each patient indexed by their unique patient ID.
-
+    private AlertGenerator alertGenerator;
     /**
      * Contructs a map to store the list of alert for each patient
      * 
      * @param alertStorage object that stores the alerts
      */
-    public AlertManager(AlertStorage alertStorage){
+    public AlertManager(){
+        AlertStorage alertStorage = new AlertStorage();
         alertMap = alertStorage.getAllAlerts();
+        
+    }
+
+    public void evaluateData(Patient patient, DataStorage dataStorage){
+        alertGenerator = new AlertGenerator(dataStorage, this);
+        alertGenerator.evaluateData(patient);
+    }
+
+    public void triggerAlert(Alert alert){
+        addAlert(alert);
+    }
+
+    public void printAllAlerts(){
+        for(Map.Entry<Integer, List<Alert>> entry: alertMap.entrySet()){
+            System.out.println("Patient ID: " + entry.getKey());
+            for(Alert alert: entry.getValue()){
+                System.out.println("Condition: " + alert.getCondition() + " Timestamp: " + alert.getTimestamp());
+            }
+        }
     }
 
     /**

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import com.alerts.AlertGenerator;
 
 /**
  * Manages storage and retrieval of patient data within a healthcare monitoring
@@ -39,9 +38,18 @@ public class DataStorage {
      */
     public void addPatientData(int patientId, double measurementValue, String recordType, long timestamp) {
         Patient patient = patientMap.get(patientId);
-        if (patient == null) {
+        if (patient == null) {// If the patient does not exist, create a new patient
             patient = new Patient(patientId);
             patientMap.put(patientId, patient);
+        } else {
+            // Check if the record already exists
+            List<PatientRecord> records = patient.getRecords(timestamp, timestamp);
+            for(int i = records.size()-1; i>=0; i--){
+                if(records.get(i).getRecordType().equals(recordType) && records.get(i).getMeasurementValue() == measurementValue){
+                    System.out.println("Record already exists");
+                    return;
+                }
+            }
         }
         patient.addRecord(measurementValue, recordType, timestamp);
     }
@@ -97,6 +105,17 @@ public class DataStorage {
      */
     public List<Patient> getAllPatients() {
         return new ArrayList<>(patientMap.values());
+    }
+
+    public void printAllPatients(){
+        for(Patient patient: patientMap.values()){
+            for(PatientRecord record: patient.getRecords(0, Long.MAX_VALUE)){
+                System.out.println("Patient ID: " + record.getPatientId() +
+                        ", Type: " + record.getRecordType() +
+                        ", Data: " + record.getMeasurementValue() +
+                        ", Timestamp: " + record.getTimestamp());
+            }
+        }
     }
 
     /**

@@ -1,14 +1,6 @@
 package com.alerts;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.List;
-import java.util.Scanner;
-
-import com.cardio_generator.outputs.OutputStrategy;
-import com.cardio_generator.outputs.TcpOutputStrategy;
-import com.data_management.DataParser;
 import com.data_management.DataStorage;
 import com.data_management.Patient;
 import com.data_management.PatientRecord;
@@ -21,20 +13,21 @@ import com.data_management.PatientRecord;
  */
 public class AlertGenerator {
     private DataStorage dataStorage;
-    private AlertStorage alertStorage = new AlertStorage();
-    private AlertManager alertManager = new AlertManager(alertStorage);
+    private AlertManager alertManager;
 
     /**
      * Constructs an {@code AlertGenerator} with a specified {@code DataStorage}.
      * The {@code DataStorage} is used to retrieve patient data that this class
      * will monitor and evaluate.
      *
-     * @param dataStorage the data storage system that provides access to patient
+     * @param alertStorage the data storage system that provides access to patient
      *                    data
      */
-    public AlertGenerator(DataStorage dataStorage) {
-        this.dataStorage = dataStorage;
+    public AlertGenerator(DataStorage datastorage, AlertManager alertManager) {
+        this.dataStorage = datastorage;;
+        this.alertManager = alertManager;
     }
+
 
     
     /**
@@ -47,7 +40,7 @@ public class AlertGenerator {
      *
      * @param patient the patient data to evaluate for alert conditions
      */
-    public void evaluateData(Patient patient) {
+    protected void evaluateData(Patient patient) {
 
         /**
          * message to the person giving feedback:
@@ -230,7 +223,7 @@ public class AlertGenerator {
      *
      * @param alert the alert object containing details about the alert condition
      */
-    public void triggerAlert(Alert alert) {
+    protected void triggerAlert(Alert alert) {
 
         System.out.println(alert.getCondition());
         alertManager.addAlert(alert); //add the alert to the alert storage via alertManager
@@ -240,7 +233,7 @@ public class AlertGenerator {
     }
 
 
-    public List<Alert> getAlertsPatient(int patientId){
+    protected List<Alert> getAlertsPatient(int patientId){
         return alertManager.getAlertsPatient(patientId);
     }
 

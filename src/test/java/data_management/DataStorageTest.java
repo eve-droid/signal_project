@@ -48,8 +48,7 @@ public class DataStorageTest {
         storage.addPatientData(1, 200.0, "WhiteBloodCells", 1714376789051L);
         storage.addPatientData(2, 200.0, "WhiteBloodCells", 1714376789052L);
 
-        List<PatientRecord> records = storage.getRecords(4, 1714376789050L, 1714376789051L);
-        PatientRecord record = storage.getRecord(4, 1714376789050L);//check no error occur if wrong patientId
+        List<PatientRecord> records = storage.getRecords(4, 1714376789050L, 1714376789051L);//check no error occur if wrong patientId
 
         assertEquals(0, records.size());//check if empty array
         

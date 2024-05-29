@@ -1,5 +1,0 @@
-Patient ID: 51, Timestamp: 1715250889818, Label: DiastolicPressure, Data: 72.0
-Patient ID: 39, Timestamp: 1715250889821, Label: DiastolicPressure, Data: 83.0
-Patient ID: 81, Timestamp: 1715250889811, Label: DiastolicPressure, Data: 78.0
-Patient ID: 69, Timestamp: 1715250889827, Label: DiastolicPressure, Data: 75.0
-Patient ID: 7, Timestamp: 1715250889835, Label: DiastolicPressure, Data: 74.0

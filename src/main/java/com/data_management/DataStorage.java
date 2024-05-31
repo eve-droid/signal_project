@@ -118,6 +118,18 @@ public class DataStorage {
         }
     }
 
+    public Patient getPatient(String message){
+        String[] parts = message.split(",");
+        String[] patientInfo = parts[0].split(":");
+        int patientId = Integer.parseInt(patientInfo[1].trim());
+
+        if(patientMap.get(patientId) == null){
+            Patient patient = new Patient(patientId);
+            patientMap.put(patientId, patient);
+        }
+        return patientMap.get(patientId);
+    }
+
     /**
      * The main method for the DataStorage class.
      * Initializes the system, reads data into storage, and continuously monitors

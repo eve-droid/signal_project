@@ -41,31 +41,39 @@ public class WebSocketIntegrationTest {
 
         // Verify that the alert is correctly generated
         List<Alert> alertList = alertManager.getAlertsPatient(79);
-        assertEquals("Critical Treshold Alert: Diastolic Pressure to low", alertList.get(0).getCondition()); // Assuming this method exists
+        assertEquals("Critical Treshold Alert: Diastolic Pressure too low", alertList.get(0).getCondition()); // Assuming this method exists
     }
 
     @Test
     public void testAlertGeneratorWithServerAndClient() throws IOException, URISyntaxException{
-        AlertManager alertManager = new AlertManager(); 
+        int port = 8080;
+        WebSocketOutputStrategy server = new WebSocketOutputStrategy(port);
+
+        // Wait a bit to be sure the server started
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         DataStorage dataStorage = new DataStorage();
-        WebSocketOutputStrategy server = new WebSocketOutputStrategy(9090);
-        
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        
-        InitializeWebClient client = new InitializeWebClient(alertManager, dataStorage, 9090);
+        AlertManager alertManager = new AlertManager();
 
-        try {
-            Thread.sleep(2000);
-            server.sendDataFromFile("src/test/java/data_management/OutputFilesTest/testAlert.txt");
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        // Initialize the WebSocket client
+        InitializeWebClient client = new InitializeWebClient(alertManager, dataStorage, port);
 
+            // Simulate server output to test the connection
+            try {
+                Thread.sleep(2000);
+                server.sendDataFromFile("src/test/java/data_management/OutputFilesTest/testAlert.txt");
+                
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+
+        dataStorage.printAllPatients();
+        alertManager.printAllAlerts();
         List <Alert> alertList = alertManager.getAlertsPatient(7);
 
         assertEquals(14, alertList.size());
@@ -82,18 +90,18 @@ public class WebSocketIntegrationTest {
             writer.write("Patient ID: 7, Timestamp: 1715250889835, Label: DiastolicPressure, Data: 57.0\n");//too low alert
             writer.write("Patient ID: 7, Timestamp: 1715250889953, Label: DiastolicPressure, Data: 125.0\n");//too high alert
 
-            writer.write("Patient ID: 7, Timestamp: 1715250890135, Label: SystolicPressure, Data: 189.0\n");//too high alert
-            writer.write("Patient ID: 7, Timestamp: 1715250890035, Label: SystolicPressure, Data: 67.0\n");//too low alert
+            writer.write("Patient ID: 7, Timestamp: 1715250890035, Label: SystolicPressure, Data: 189.0\n");//too high alert
+            writer.write("Patient ID: 7, Timestamp: 1715250890135, Label: SystolicPressure, Data: 67.0\n");//too low alert
 
-            writer.write("Patient ID: 7, Timestamp: 1715250890335, Label: DiastolicPressure, Data: 91.0\n");
-            writer.write("Patient ID: 7, Timestamp: 1715250890535, Label: DiastolicPressure, Data: 69.0\n");//decreasing trend alert
-            writer.write("Patient ID: 7, Timestamp: 1715250890235, Label: DiastolicPressure, Data: 80.0\n");
-            writer.write("Patient ID: 7, Timestamp: 1715250890435, Label: DiastolicPressure, Data: 95.0\n");//increasing trend alert
+            writer.write("Patient ID: 7, Timestamp: 1715250890235, Label: DiastolicPressure, Data: 91.0\n");
+            writer.write("Patient ID: 7, Timestamp: 1715250890335, Label: DiastolicPressure, Data: 69.0\n");//decreasing trend alert
+            writer.write("Patient ID: 7, Timestamp: 1715250890435, Label: DiastolicPressure, Data: 80.0\n");
+            writer.write("Patient ID: 7, Timestamp: 1715250890535, Label: DiastolicPressure, Data: 95.0\n");//increasing trend alert
 
-            writer.write("Patient ID: 7, Timestamp: 1715250890235, Label: SystolicPressure, Data: 97.0\n");
-            writer.write("Patient ID: 7, Timestamp: 1715250890335, Label: SystolicPressure, Data: 120.0\n");//increasing trend alert
-            writer.write("Patient ID: 7, Timestamp: 1715250890435, Label: SystolicPressure, Data: 108.0\n");
-            writer.write("Patient ID: 7, Timestamp: 1715250890535, Label: SystolicPressure, Data: 91.0\n");//decreasing trend alert
+            writer.write("Patient ID: 7, Timestamp: 1715250890545, Label: SystolicPressure, Data: 97.0\n");
+            writer.write("Patient ID: 7, Timestamp: 1715250890555, Label: SystolicPressure, Data: 120.0\n");//increasing trend alert
+            writer.write("Patient ID: 7, Timestamp: 1715250890565, Label: SystolicPressure, Data: 108.0\n");
+            writer.write("Patient ID: 7, Timestamp: 1715250890575, Label: SystolicPressure, Data: 91.0\n");//decreasing trend alert
 
             writer.write("Patient ID: 7, Timestamp: 1715250890635, Label: Saturation, Data: 90.0\n");//too low alert
             writer.write("Patient ID: 7, Timestamp: 1715250890735, Label: SystolicPressure, Data: 65.0\n");//combined with a sysPressure too low alert
@@ -105,7 +113,7 @@ public class WebSocketIntegrationTest {
             writer.write("Patient ID: 7, Timestamp: 1715250892750, Label: ECG, Data: 0.408271\n");//48 bpm, too low alert
             writer.write("Patient ID: 7, Timestamp: 1715250893750, Label: ECG, Data: 0.408271\n");//60 bpm
             writer.write("Patient ID: 7, Timestamp: 1715250894430, Label: ECG, Data: 0.408271\n");//88 bpm
-            writer.write("Patient ID: 7, Timestamp: 1715250895100, Label: ECG, Data: 0.408271\n");//90bpm
+            writer.write("Patient ID: 7, Timestamp: 1715250895100, Label: ECG, Data: 0.408271\n");//90 bpm
             writer.write("Patient ID: 7, Timestamp: 1715250895930, Label: ECG, Data: 0.408271\n");//72 bpm
             writer.write("Patient ID: 7, Timestamp: 1715250896600, Label: ECG, Data: 0.408271\n");//90 bpm
             writer.write("Patient ID: 7, Timestamp: 1715250897600, Label: ECG, Data: 0.408271\n");//60 bpm, irregular bpm alert

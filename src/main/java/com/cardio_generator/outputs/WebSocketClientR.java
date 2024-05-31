@@ -36,25 +36,16 @@ public class WebSocketClientR extends WebSocketClient{
             System.out.println("Received message: " + message);
             parser.readData(dataStorage, message);
             System.out.println("Data parsed and stored successfully");
-            onMessageContinuously();
+
+            Patient patient = dataStorage.getPatient(message);
+ 
+            alertManager.evaluateData(patient, dataStorage);
+            
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void onMessageContinuously() {
-        Timer timer = new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                List<Patient> allPatients = dataStorage.getAllPatients();
-                for (Patient patient : allPatients) {
-                    alertManager.evaluateData(patient, dataStorage);
-                }
-            }
-        },0, 4000);//check every 4 seconds
-        
-    }
 
     @Override
     public void onClose(int code, String reason, boolean remote) {

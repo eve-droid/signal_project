@@ -128,20 +128,14 @@ public class AlertManager {
 
         if(!contain(list, updatedAlert)){//if no similar alert, add the updates alert
             alertMap.get(patientId).add(updatedAlert);
-        } else{ //otherwise change the timestamp of the already ewisting alert in the alert storage
-            for(int i =0; i<list.size(); i++){
-                if(sameAlert(updatedAlert, list.get(i))){
-                    alertMap.get(patientId).get(i).setTimestamp(updatedAlert.getTimestamp());
-                }
-            }
         }
 
     }
 
 
     public boolean contain(List<Alert> list, Alert alert){
-        for(Alert currentAlert: list){
-            if (sameAlert(alert, currentAlert)){
+        for(int i =0; i<list.size(); i++){
+            if (sameAlert(alert, list.get(i))){
                 return true;
             }
         }

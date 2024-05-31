@@ -29,19 +29,16 @@ public class Main {
             // Simulate server output to test the connection
             try {
                 Thread.sleep(2000);
-                synchronized (dataStorage) {
-                    //server.output(15725, System.currentTimeMillis(), "low saturation", "26");
-                    server.sendDataFromFile("src/test/java/data_management/OutputFilesTest/testAlert.txt");
-                }
-                Thread.sleep(2000);//wait for the client to receive the message
+                server.sendDataFromFile("src/test/java/data_management/OutputFilesTest/testAlert.txt");
+                
+                //Thread.sleep(2000);//wait for the client to receive the message
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
 
-            //synchronized (dataStorage) {
-                dataStorage.printAllPatients();
-                alertManager.printAllAlerts();
-            //}
+            dataStorage.printAllPatients();
+            alertManager.printAllAlerts();
+            System.out.println(alertManager.getAlertsPatient(7).size());
 
     }
 }

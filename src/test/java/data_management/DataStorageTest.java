@@ -17,10 +17,14 @@ public class DataStorageTest {
 
     @Test
     public void testAddAndGetRecords() {
-        DataStorage storage = new DataStorage();
+        DataStorage storage = DataStorage.getInstance();
         storage.addPatientData(1, 100.0, "WhiteBloodCells", 1714376789050L);
         storage.addPatientData(1, 200.0, "WhiteBloodCells", 1714376789051L);
         storage.addPatientData(2, 200.0, "WhiteBloodCells", 1714376789052L);
+
+        int numberOfRecords = storage.totalNumberOfRecord();
+
+        assertEquals(3, numberOfRecords); // Check if three records are added
 
         List<PatientRecord> records = storage.getRecords(1, 1714376789050L, 1714376789051L);
         assertEquals(2, records.size()); // Check if two records are retrieved
@@ -32,10 +36,7 @@ public class DataStorageTest {
 
     @Test
     public void testAddAndGetPatients() {
-        DataStorage storage = new DataStorage();
-        storage.addPatientData(1, 100.0, "WhiteBloodCells", 1714376789050L);
-        storage.addPatientData(1, 200.0, "WhiteBloodCells", 1714376789051L);
-        storage.addPatientData(2, 200.0, "WhiteBloodCells", 1714376789052L);
+        DataStorage storage = DataStorage.getInstance();
 
         List<Patient> patientList = storage.getAllPatients();
         assertEquals(2, patientList.size());//check number of patients
@@ -43,10 +44,7 @@ public class DataStorageTest {
 
     @Test
     public void testAddAndGetWrongRecords() {
-        DataStorage storage = new DataStorage();
-        storage.addPatientData(1, 100.0, "WhiteBloodCells", 1714376789050L);
-        storage.addPatientData(1, 200.0, "WhiteBloodCells", 1714376789051L);
-        storage.addPatientData(2, 200.0, "WhiteBloodCells", 1714376789052L);
+        DataStorage storage = DataStorage.getInstance();
 
         List<PatientRecord> records = storage.getRecords(4, 1714376789050L, 1714376789051L);//check no error occur if wrong patientId
 

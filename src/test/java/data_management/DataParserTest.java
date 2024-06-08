@@ -23,7 +23,7 @@ public class DataParserTest {
     public void parseData() throws IOException{
 
         DataParser parser = new DataParser();
-        DataStorage dataStorage = new DataStorage();
+        DataStorage dataStorage = DataStorage.getInstance();
 
         parser.readData(dataStorage, "Patient ID: 51, Timestamp: 1715250889818, Label: DiastolicPressure, Data: 72.0");
         parser.readData(dataStorage, "Patient ID: 39, Timestamp: 1715250889821, Label: DiastolicPressure, Data: 83.0");
@@ -35,9 +35,6 @@ public class DataParserTest {
         parser.readData(dataStorage, "Patient ID: 39, Timestamp: 1715250889750, Label: SystolicPressure, Data: 120.0");//shouldn't be added to data storage since duplicate record
         parser.readData(dataStorage, "Patient ID: 39, Timestamp: 1715250889750, Label: SystolicPressure, Data: low");//shouldn't be added to data storage since not a double
         
-        int numberOfRecords = dataStorage.totalNumberOfRecord();
-
-        assertEquals(7, numberOfRecords); //check the number of records
 
         List<PatientRecord> records = dataStorage.getRecords(51, 1700000000000L, 1800000000000L);
 

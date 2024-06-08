@@ -12,8 +12,10 @@ import com.data_management.Patient;
  * This class manages all the alerts (e.g. adding a new alert, deleting one)
  */
 public class AlertManager {
-    protected Map<Integer, List<Alert>> alertMap; // Stores the list of alert objects of each patient indexed by their unique patient ID.
+    protected Map<Integer, List<ConcreteAlert>> alertMap; // Stores the list of alert objects of each patient indexed by their unique patient ID.
     private AlertGenerator alertGenerator;
+
+
     /**
      * Contructs a map to store the list of alert for each patient
      * 
@@ -25,19 +27,33 @@ public class AlertManager {
         
     }
 
+    /**
+     * Evaluates the patient data and triggers an alert if necessary
+     * 
+     * @param patient patient to evaluate the data for
+     * @param dataStorage object that stores the data
+     */
     public void evaluateData(Patient patient, DataStorage dataStorage){
         alertGenerator = new AlertGenerator(dataStorage, this);
         alertGenerator.evaluateData(patient);
     }
 
-    public void triggerAlert(Alert alert){
+    /**
+     * Triggers an alert
+     * 
+     * @param alert alert to be triggered
+     */
+    public void triggerAlert(ConcreteAlert alert){
         addAlert(alert);
     }
 
+    /**
+     * prints all the alerts stored
+     */
     public void printAllAlerts(){
-        for(Map.Entry<Integer, List<Alert>> entry: alertMap.entrySet()){
+        for(Map.Entry<Integer, List<ConcreteAlert>> entry: alertMap.entrySet()){
             System.out.println("Patient ID: " + entry.getKey());
-            for(Alert alert: entry.getValue()){
+            for(ConcreteAlert alert: entry.getValue()){
                 System.out.println("Condition: " + alert.getCondition() + " Timestamp: " + alert.getTimestamp());
             }
         }
@@ -48,15 +64,15 @@ public class AlertManager {
      * 
      * @param alert alert to be added
      */
-    public void addAlert(Alert alert){
+    public void addAlert(ConcreteAlert alert){
 
         int patientId = Integer.parseInt(alert.getPatientId());
-        List<Alert> patientList = alertMap.get(patientId);
+        List<ConcreteAlert> patientList = alertMap.get(patientId);
 
         if(patientList != null){
             updateAlert(alert);
         } else{ //create new entry if the patient doesn't exist in the map already
-            List <Alert> list = new ArrayList<>();
+            List <ConcreteAlert> list = new ArrayList<>();
             list.add(alert);
             alertMap.put(patientId, list);
         }
@@ -67,7 +83,7 @@ public class AlertManager {
      * 
      * @param alert alert to be resolved and deleted
      */
-    public void resolveAlert(Alert alert){
+    public void resolveAlert(ConcreteAlert alert){
         int patientId = Integer.parseInt(alert.getPatientId());
 
         if(alertMap.get(patientId) != null){ //check if the patient has any alert
@@ -96,7 +112,7 @@ public class AlertManager {
      * 
      * @return true if the two alerts are the same, false otherwise
      */
-    public boolean sameAlert(Alert alert1, Alert alert2){
+    public boolean sameAlert(ConcreteAlert alert1, ConcreteAlert alert2){
         if(alert1.getCondition().equals(alert2.getCondition()) && alert1.getPatientId().equals(alert2.getPatientId())){
             return true;
         }
@@ -110,7 +126,7 @@ public class AlertManager {
      * 
      * @return list of alerts of the patient
      */
-    public List<Alert> getAlertsPatient(int patientId){
+    public List<ConcreteAlert> getAlertsPatient(int patientId){
         return alertMap.get(patientId);
     }
 
@@ -122,9 +138,9 @@ public class AlertManager {
      * 
      * @param updatedAlert the alert with the updated timestamp
      */
-    public void updateAlert(Alert updatedAlert){
+    public void updateAlert(ConcreteAlert updatedAlert){
         int patientId = Integer.parseInt(updatedAlert.getPatientId());
-        List<Alert> list = alertMap.get(patientId);
+        List<ConcreteAlert> list = alertMap.get(patientId);
 
         if(!contain(list, updatedAlert)){//if no similar alert, add the updates alert
             alertMap.get(patientId).add(updatedAlert);
@@ -133,7 +149,15 @@ public class AlertManager {
     }
 
 
-    public boolean contain(List<Alert> list, Alert alert){
+    /**
+     * checks if the given alert is present in the list of alerts
+     * 
+     * @param list list of alerts
+     * @param alert alert to be checked
+     * 
+     * @return true if the alert is present in the list, false otherwise
+     */
+    public boolean contain(List<ConcreteAlert> list, ConcreteAlert alert){
         for(int i =0; i<list.size(); i++){
             if (sameAlert(alert, list.get(i))){
                 return true;

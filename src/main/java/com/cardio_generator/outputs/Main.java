@@ -20,7 +20,7 @@ public class Main {
             e.printStackTrace();
         }
 
-        DataStorage dataStorage = new DataStorage();
+        DataStorage dataStorage = DataStorage.getInstance();
         AlertManager alertManager = new AlertManager();
 
         // Initialize the WebSocket client
@@ -31,7 +31,7 @@ public class Main {
                 Thread.sleep(2000);
                 server.sendDataFromFile("src/test/java/data_management/OutputFilesTest/testAlert.txt");
                 
-                //Thread.sleep(2000);//wait for the client to receive the message
+                Thread.sleep(1000);//wait for the client to receive the message
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

@@ -13,13 +13,26 @@ import java.util.Map;
  */
 public class DataStorage {
     private Map<Integer, Patient> patientMap; // Stores patient objects indexed by their unique patient ID.
+    private static DataStorage instance; // Singleton instance of the DataStorage class
 
     /**
      * Constructs a new instance of DataStorage, initializing the underlying storage
      * structure.
      */
-    public DataStorage() {
+    private DataStorage() {
         this.patientMap = new HashMap<>();
+    }
+
+    /**
+     * Returns the singleton instance of the DataStorage class.
+     * 
+     * @return the singleton instance of the DataStorage class
+     */
+    public static DataStorage getInstance(){
+        if(instance == null){
+            instance = new DataStorage();
+        }
+        return instance;
     }
 
 
@@ -107,6 +120,9 @@ public class DataStorage {
         return new ArrayList<>(patientMap.values());
     }
 
+    /**
+     * Prints all the patients and their records
+     */
     public void printAllPatients(){
         for(Patient patient: patientMap.values()){
             for(PatientRecord record: patient.getRecords(0, Long.MAX_VALUE)){
@@ -118,6 +134,12 @@ public class DataStorage {
         }
     }
 
+    /**
+     * Retrieves a patient object from the patientMap
+     * 
+     * @param message message containing the patient ID
+     * @return the patient object
+     */
     public Patient getPatient(String message){
         String[] parts = message.split(",");
         String[] patientInfo = parts[0].split(":");

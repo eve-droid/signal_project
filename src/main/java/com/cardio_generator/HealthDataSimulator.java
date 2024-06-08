@@ -4,7 +4,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import com.alerts.Alert;
+import com.alerts.ConcreteAlert;
 import com.alerts.AlertManager;
 import com.cardio_generator.generators.AlertGenerator2;
 
@@ -41,6 +41,24 @@ public class HealthDataSimulator {
     private static ScheduledExecutorService scheduler;
     private static OutputStrategy outputStrategy = new ConsoleOutputStrategy(); // Default output strategy
     private static final Random random = new Random();
+    private static HealthDataSimulator instance; // Singleton instance of the HealthDataSimulator class
+
+    /**
+     * Constructs a new instance of the HealthDataSimulator class
+     */
+    private HealthDataSimulator() {}
+
+    /**
+     * Returns the singleton instance of the HealthDataSimulator class
+     * 
+     * @return the singleton instance of the HealthDataSimulator class
+     */
+    public static HealthDataSimulator getInstance(){
+        if(instance == null){
+            instance = new HealthDataSimulator();
+        }
+        return instance;
+    }
 
     /**
      * Main method of the class
@@ -197,16 +215,20 @@ public class HealthDataSimulator {
     }
 
 
-    public void triggerAlert(Button alertButton, Patient patient){
+    /**
+     * Triggers an alert for a patient
+     * 
+     * @param alertButton button that triggers the alert
+     * @param patient patient for which the alert is triggered
+     * @param alertManager alert manager that manages the alerts
+     */
+    public void triggerAlert(Button alertButton, Patient patient, AlertManager alertManager){
         alertButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // Emit an event to indicate that a triggered alert should be generated
-                AlertManager alertManager = new AlertManager();
-                alertManager.triggerAlert(new Alert(patient.getPatientId(), "Manual alert for patient " + patient.getPatientId(), System.currentTimeMillis()));;
+                alertManager.triggerAlert(new ConcreteAlert(patient.getPatientId(), "Manual alert for patient " + patient.getPatientId(), System.currentTimeMillis()));;
             }
-
-            
         });
     }
 }

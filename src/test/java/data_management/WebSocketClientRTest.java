@@ -19,7 +19,7 @@ public class WebSocketClientRTest {
 
     @Before
     public void setUp() throws URISyntaxException {
-        DataStorage dataStorage = new DataStorage();
+        DataStorage dataStorage = DataStorage.getInstance();
         AlertManager alertManager = new AlertManager();
         webSocketClientR = new WebSocketClientR(new URI("ws://localhost:8080"), dataStorage, alertManager);
     }

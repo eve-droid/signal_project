@@ -1,6 +1,6 @@
 package data_management;
 
-import com.alerts.Alert;
+import com.alerts.ConcreteAlert;
 import com.alerts.AlertManager;
 import com.cardio_generator.outputs.InitializeWebClient;
 import com.cardio_generator.outputs.WebSocketClientR;
@@ -16,6 +16,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 
+import javax.xml.crypto.Data;
+
 import static org.junit.Assert.assertEquals;
 
 public class WebSocketIntegrationTest {
@@ -23,7 +25,7 @@ public class WebSocketIntegrationTest {
 
     @Test
     public void testIntegration() throws URISyntaxException {
-        DataStorage dataStorage = new DataStorage();
+        DataStorage dataStorage = DataStorage.getInstance();
         AlertManager alertManager = new AlertManager(); 
         WebSocketClientR webSocketClientR = new WebSocketClientR(new URI("ws://localhost:8080"), dataStorage, alertManager);
 
@@ -40,8 +42,8 @@ public class WebSocketIntegrationTest {
         alertManager.evaluateData(new Patient(79), dataStorage);
 
         // Verify that the alert is correctly generated
-        List<Alert> alertList = alertManager.getAlertsPatient(79);
-        assertEquals("Critical Treshold Alert: Diastolic Pressure too low", alertList.get(0).getCondition()); // Assuming this method exists
+        List<ConcreteAlert> alertList = alertManager.getAlertsPatient(79);
+        assertEquals("Critical Treshold Alert - Diastolic Pressure too low", alertList.get(0).getCondition()); // Assuming this method exists
     }
 
     @Test
@@ -56,7 +58,7 @@ public class WebSocketIntegrationTest {
             e.printStackTrace();
         }
 
-        DataStorage dataStorage = new DataStorage();
+        DataStorage dataStorage = DataStorage.getInstance();
         AlertManager alertManager = new AlertManager();
 
         // Initialize the WebSocket client
@@ -74,7 +76,7 @@ public class WebSocketIntegrationTest {
 
         dataStorage.printAllPatients();
         alertManager.printAllAlerts();
-        List <Alert> alertList = alertManager.getAlertsPatient(7);
+        List <ConcreteAlert> alertList = alertManager.getAlertsPatient(7);
 
         assertEquals(14, alertList.size());
     }

@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-import com.alerts.Alert;
+import com.alerts.ConcreteAlert;
 import com.alerts.AlertManager;
 
 
@@ -17,12 +17,12 @@ public class AlertManagerTest {
 
         AlertManager manager = new AlertManager();
 
-        Alert alert1 = new Alert("1", "High Heart Rate", 1715250800000L);
-        Alert alert2 = new Alert("1", "High Saturation", 1715250800001L);
+        ConcreteAlert alert1 = new ConcreteAlert("1", "High Heart Rate", 1715250800000L);
+        ConcreteAlert alert2 = new ConcreteAlert("1", "High Saturation", 1715250800001L);
 
         manager.addAlert(alert1);
         manager.addAlert(alert2);
-        List<Alert> alertList = manager.getAlertsPatient(1);
+        List<ConcreteAlert> alertList = manager.getAlertsPatient(1);
 
         assertEquals(2, alertList.size());
 
@@ -31,8 +31,8 @@ public class AlertManagerTest {
 
         assertEquals(1, alertList.size());
 
-        Alert alert3 = new Alert("3", "High Saturation", 1715250800001L);
-        Alert alert4 = new Alert("1", "High Diastolic Pressure", 1715250800001L);
+        ConcreteAlert alert3 = new ConcreteAlert("3", "High Saturation", 1715250800001L);
+        ConcreteAlert alert4 = new ConcreteAlert("1", "High Diastolic Pressure", 1715250800001L);
 
         manager.resolveAlert(alert3);
         manager.resolveAlert(alert4);

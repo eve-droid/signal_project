@@ -1,4 +1,6 @@
-package com.alerts;
+package com.alerts.AlertDecorator;
+
+import com.alerts.Alert;
 
 /**
  * Represents a repeated alert decorator
@@ -7,6 +9,7 @@ public class RepeatedAlertDecorator extends AlertDecorator{
     
     private int RepeatCheck;
     private long timeInterval;
+    private int repeatCount = 0;
     
     /**
      * Create a repeated alert decorator
@@ -26,12 +29,21 @@ public class RepeatedAlertDecorator extends AlertDecorator{
     public void repeatTheAlert() {
         for(int i = 0; i < RepeatCheck; i++) {
             repeatAlert();
+            repeatCount++;
             try {
                 Thread.sleep(timeInterval);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    /**
+     * Get the number of times the alert has been repeated
+     * @return repeatCount
+     */
+    public int getRepeatCount() {
+        return repeatCount;
     }
 
     /**

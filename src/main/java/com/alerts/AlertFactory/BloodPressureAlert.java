@@ -1,4 +1,6 @@
-package com.alerts;
+package com.alerts.AlertFactory;
+
+import com.alerts.ConcreteAlert;
 
 /**
  * Represents a blood pressure alert

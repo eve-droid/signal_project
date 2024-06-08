@@ -39,6 +39,7 @@ public class WebSocketOutputStrategy implements OutputStrategy {
         }
     }
 
+    
     public void sendDataFromFile(String filePath) {
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;

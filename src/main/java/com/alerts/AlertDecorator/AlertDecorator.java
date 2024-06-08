@@ -1,4 +1,6 @@
-package com.alerts;
+package com.alerts.AlertDecorator;
+
+import com.alerts.Alert;
 
 /**
  * Represents an alert decorator

@@ -1,5 +1,7 @@
-package com.alerts;
+package com.alerts.AlertStrategy;
 
+import com.alerts.AlertGenerator;
+import com.alerts.AlertFactory.BloodPressureAlertConcreteCreator;
 import com.data_management.PatientRecord;
 import java.util.List; 
 
@@ -8,6 +10,7 @@ import java.util.List;
  */
 public class BloodPressureStrategy implements AlertStrategy{
 
+    private BloodPressureAlertConcreteCreator bloodPressureAlertFactory;
     private AlertGenerator alertGenerator;
 
     /**
@@ -15,7 +18,8 @@ public class BloodPressureStrategy implements AlertStrategy{
      * @param alertGenerator alert generator
      */
     public BloodPressureStrategy(AlertGenerator alertGenerator){
-        this.alertGenerator = alertGenerator;
+        this.alertGenerator = alertGenerator;  
+        this.bloodPressureAlertFactory = new BloodPressureAlertConcreteCreator();
     }
     
     /**
@@ -47,9 +51,9 @@ public class BloodPressureStrategy implements AlertStrategy{
 
         //Treshold check
         if (measurement < 60){
-            alertGenerator.triggerAlert(new BloodPressureAlert(patientId, "Critical Treshold Alert - Diastolic Pressure too low", timeStamp));
+            alertGenerator.triggerAlert(bloodPressureAlertFactory.createAlert(patientId, "Critical Treshold Alert - Diastolic Pressure too low", timeStamp));
         } else if(measurement > 120){
-            alertGenerator.triggerAlert(new BloodPressureAlert(patientId, "Critical Treshold Alert - Diastolic Pressure too high", timeStamp));
+            alertGenerator.triggerAlert(bloodPressureAlertFactory.createAlert(patientId, "Critical Treshold Alert - Diastolic Pressure too high", timeStamp));
         }
 
 
@@ -67,7 +71,7 @@ public class BloodPressureStrategy implements AlertStrategy{
                     } else if(!decreaseInDP){
                         decreaseInDP = true;
                     } else {
-                        alertGenerator.triggerAlert(new BloodPressureAlert(patientId, "Decreasing Trend Alert in Diastolic Pressure", timeStamp));
+                        alertGenerator.triggerAlert(bloodPressureAlertFactory.createAlert(patientId, "Decreasing Trend Alert in Diastolic Pressure", timeStamp));
                         return;
                     }
                 }
@@ -77,7 +81,7 @@ public class BloodPressureStrategy implements AlertStrategy{
                     }else if(!increaseInDP){
                         increaseInDP = true;
                     } else {
-                        alertGenerator.triggerAlert(new BloodPressureAlert(patientId, "Increasing Trend Alert in Diastolic Pressure", timeStamp));
+                        alertGenerator.triggerAlert(bloodPressureAlertFactory.createAlert(patientId, "Increasing Trend Alert in Diastolic Pressure", timeStamp));
                         return;
                     }
                 } else{
@@ -119,12 +123,12 @@ public class BloodPressureStrategy implements AlertStrategy{
                 }
             }
             if(saturationTooLow){
-                alertGenerator.triggerAlert(new BloodPressureAlert(patientId, "Critical Treshold Alert - Hypotensive Hypoxemia Alert", timeStamp));
+                alertGenerator.triggerAlert(bloodPressureAlertFactory.createAlert(patientId, "Critical Treshold Alert - Hypotensive Hypoxemia Alert", timeStamp));
             } else{
-                alertGenerator.triggerAlert(new BloodPressureAlert(patientId, "Critical Treshold Alert - Systolic pressure too low", timeStamp));
+                alertGenerator.triggerAlert(bloodPressureAlertFactory.createAlert(patientId, "Critical Treshold Alert - Systolic pressure too low", timeStamp));
             }
         } else if(measurement > 180){
-            alertGenerator.triggerAlert(new BloodPressureAlert(patientId, "Critical Treshold Alert  Systolic pressure too high", timeStamp));
+            alertGenerator.triggerAlert(bloodPressureAlertFactory.createAlert(patientId, "Critical Treshold Alert  Systolic pressure too high", timeStamp));
         }
 
         //verify if there is a decrease/increase in the measurements
@@ -141,7 +145,7 @@ public class BloodPressureStrategy implements AlertStrategy{
                     } else if(!decreaseInSP){
                         decreaseInSP = true;
                     } else {
-                        alertGenerator.triggerAlert(new BloodPressureAlert(patientId, "Decreasing Trend Alert in Systolic Pressure", timeStamp));
+                        alertGenerator.triggerAlert(bloodPressureAlertFactory.createAlert(patientId, "Decreasing Trend Alert in Systolic Pressure", timeStamp));
                         return;
                     }
                 }
@@ -151,7 +155,7 @@ public class BloodPressureStrategy implements AlertStrategy{
                     } else if(!increaseInSP){
                         increaseInSP = true;
                     } else {
-                        alertGenerator.triggerAlert(new BloodPressureAlert(patientId, "Increasing Trend Alert in Systolic Pressure", timeStamp));
+                        alertGenerator.triggerAlert(bloodPressureAlertFactory.createAlert(patientId, "Increasing Trend Alert in Systolic Pressure", timeStamp));
                         return;
                     }
                 } else{

@@ -1,5 +1,7 @@
-package com.alerts;
+package com.alerts.AlertStrategy;
 
+import com.alerts.AlertGenerator;
+import com.alerts.AlertFactory.ECGAlertConcreteCreator;
 import com.data_management.PatientRecord;
 import java.util.List; 
 
@@ -8,6 +10,7 @@ import java.util.List;
  */
 public class ECGStrategy implements AlertStrategy{
 
+    private ECGAlertConcreteCreator ecgAlertConcreteCreator;
     private AlertGenerator alertGenerator;
 
     /**
@@ -16,6 +19,7 @@ public class ECGStrategy implements AlertStrategy{
      */
     public ECGStrategy(AlertGenerator alertGenerator){
         this.alertGenerator = alertGenerator;
+        this.ecgAlertConcreteCreator = new ECGAlertConcreteCreator();
     }
     
     /**
@@ -45,9 +49,9 @@ public class ECGStrategy implements AlertStrategy{
 
                 //Treshold check
                 if (bpm < 50){
-                    alertGenerator.triggerAlert(new ECGAlert(patientId, "Critical Treshold Alert - Heart Rate too low", record.getTimestamp()));
+                    alertGenerator.triggerAlert(ecgAlertConcreteCreator.createAlert(patientId, "Critical Treshold Alert - Heart Rate too low", record.getTimestamp()));
                 } else if(bpm > 100){
-                    alertGenerator.triggerAlert(new ECGAlert(patientId, "Critical Treshold Alert - Heart Rate too high", record.getTimestamp()));
+                    alertGenerator.triggerAlert(ecgAlertConcreteCreator.createAlert(patientId, "Critical Treshold Alert - Heart Rate too high", record.getTimestamp()));
                 }
 
 
@@ -70,7 +74,7 @@ public class ECGStrategy implements AlertStrategy{
 
                         //assumption: if the number keeping track of the irregular bpm gets to 5, it is considered a pattern and an alert is triggerred
                         if(irregularBpm >= 5){
-                            alertGenerator.triggerAlert(new ECGAlert(patientId, "Trend Alert - Abnormal Heart Rate", patientRecord.get(k).getTimestamp()));
+                            alertGenerator.triggerAlert(ecgAlertConcreteCreator.createAlert(patientId, "Trend Alert - Abnormal Heart Rate", patientRecord.get(k).getTimestamp()));
                             return;
                         }
                         bpm = previousBpm;

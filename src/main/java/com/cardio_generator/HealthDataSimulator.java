@@ -5,6 +5,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import com.alerts.ConcreteAlert;
+import com.alerts.AlertGenerator;
 import com.alerts.AlertManager;
 import com.cardio_generator.generators.AlertGenerator2;
 
@@ -222,12 +223,12 @@ public class HealthDataSimulator {
      * @param patient patient for which the alert is triggered
      * @param alertManager alert manager that manages the alerts
      */
-    public void triggerAlert(Button alertButton, Patient patient, AlertManager alertManager){
+    public void triggerAlert(Button alertButton, Patient patient, AlertGenerator alertGenerator){
         alertButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // Emit an event to indicate that a triggered alert should be generated
-                alertManager.triggerAlert(new ConcreteAlert(patient.getPatientId(), "Manual alert for patient " + patient.getPatientId(), System.currentTimeMillis()));;
+                alertGenerator.triggerAlert(new ConcreteAlert(patient.getPatientId(), "Manual alert for patient " + patient.getPatientId(), System.currentTimeMillis()));;
             }
         });
     }

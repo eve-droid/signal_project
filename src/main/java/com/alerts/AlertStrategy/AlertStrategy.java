@@ -1,4 +1,4 @@
-package com.alerts;
+package com.alerts.AlertStrategy;
 
 import com.data_management.PatientRecord;
 import java.util.List; 

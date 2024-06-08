@@ -1,6 +1,10 @@
 package com.alerts;
 
 import java.util.List;
+
+import com.alerts.AlertStrategy.BloodOxygenStrategy;
+import com.alerts.AlertStrategy.BloodPressureStrategy;
+import com.alerts.AlertStrategy.ECGStrategy;
 import com.data_management.DataStorage;
 import com.data_management.Patient;
 import com.data_management.PatientRecord;
@@ -54,7 +58,7 @@ public class AlertGenerator {
 
             case "Saturation":
                 BloodOxygenStrategy oxygenAlertStrategy = new BloodOxygenStrategy(this);
-                oxygenAlertStrategy.evaluateSaturation(measurement, patientRecord);
+                oxygenAlertStrategy.checkAlert(measurement, patientRecord);
                 break;
 
             case "ECG":
@@ -79,7 +83,7 @@ public class AlertGenerator {
      *
      * @param alert the alert object containing details about the alert condition
      */
-    protected void triggerAlert(ConcreteAlert alert) {
+    public void triggerAlert(ConcreteAlert alert) {
 
         System.out.println(alert.getCondition());
         alertManager.addAlert(alert); //add the alert to the alert storage via alertManager
@@ -88,15 +92,5 @@ public class AlertGenerator {
         // Implementation might involve logging the alert or notifying staff
     }
 
-
-    /**
-     * Retrieves all alerts for a specific patient.
-     *
-     * @param patientId the ID of the patient to retrieve alerts for
-     * @return a list of alerts for the specified patient
-     */
-    protected List<ConcreteAlert> getAlertsPatient(int patientId){
-        return alertManager.getAlertsPatient(patientId);
-    }
 
 }

@@ -1,5 +1,5 @@
 // WebSocketClientRTest.java
-package data_management;
+package WebSocket;
 
 import org.java_websocket.handshake.ServerHandshake;
 import org.junit.Before;
@@ -32,8 +32,9 @@ public class WebSocketClientRTest {
 
     @Test
     public void testOnMessage() {
-        String message = "Patient ID: 79, Timestamp: 1715250889771, Label: WhiteBloodCells, Data: 4.338229734876824";
+        String message = "Patient ID: 9, Timestamp: 1715250889771, Label: WhiteBloodCells, Data: 4.338229734876824";
         webSocketClientR.onMessage(message);
+        webSocketClientR.onMessage("Invalid message");//check errors are handled
         // Verify that the message is parsed
     }
 
@@ -44,5 +45,12 @@ public class WebSocketClientRTest {
         boolean remote = true;
         webSocketClientR.onClose(code, reason, remote);
         // Verify that the closure message is printed
+    }
+
+    @Test
+    public void testOnError() {
+        Exception e = new Exception("Test exception");
+        webSocketClientR.onError(e);
+        // Verify that the error message is printed
     }
 }

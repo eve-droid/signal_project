@@ -1,4 +1,4 @@
-package data_management;
+package Alert_System;
 
 import static org.junit.Assert.assertEquals;
 
@@ -25,6 +25,7 @@ public class AlertManagerTest {
         List<ConcreteAlert> alertList = manager.getAlertsPatient(1);
 
         assertEquals(2, alertList.size());
+        manager.printAllAlerts();
 
         manager.resolveAlert(alert2);
         alertList = manager.getAlertsPatient(1);
@@ -38,6 +39,11 @@ public class AlertManagerTest {
         manager.resolveAlert(alert4);
 
         assertEquals(1, alertList.size());
+
+        //change the alert timestamp
+        alert1.setTimestamp(1715250800001L);
+
+        assertEquals(1715250800001L, alertList.get(0).getTimestamp());
 
 
     }

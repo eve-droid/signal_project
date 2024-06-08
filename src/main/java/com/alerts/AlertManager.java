@@ -38,14 +38,7 @@ public class AlertManager {
         alertGenerator.evaluateData(patient);
     }
 
-    /**
-     * Triggers an alert
-     * 
-     * @param alert alert to be triggered
-     */
-    public void triggerAlert(ConcreteAlert alert){
-        addAlert(alert);
-    }
+
 
     /**
      * prints all the alerts stored

@@ -1,21 +1,22 @@
-package com.alerts;
+package com.alerts.AlertFactory;
+
+import com.alerts.ConcreteAlert;
 
 /**
- * Represents an alert for blood oxygen
+ * Represents an ECG alert
  */
-public class BloodOxygenAlert extends ConcreteAlert{
+public class ECGAlert extends ConcreteAlert{
     
     /**
-     * Create a blood oxygen alert
-     * @param patientId patent identifier as a string
+     * Create an ECG alert
+     * @param patientId patient identifier as a string
      * @param condition condition of the alert as a string
      * @param timestamp timestamp of the alert as a long
      */
-    public BloodOxygenAlert(String patientId, String condition, long timestamp) {
+    public ECGAlert(String patientId, String condition, long timestamp) {
         super(patientId, condition, timestamp);
     }
     
-
     /**
      * Get the condition of the alert
      * @return condition
@@ -24,5 +25,6 @@ public class BloodOxygenAlert extends ConcreteAlert{
     public String getCondition() {
         return super.getCondition();
     }
+    
 
 }

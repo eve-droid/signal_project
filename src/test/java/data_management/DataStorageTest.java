@@ -23,6 +23,8 @@ public class DataStorageTest {
         storage.addPatientData(2, 200.0, "WhiteBloodCells", 1714376789052L);
 
         int numberOfRecords = storage.totalNumberOfRecord();
+        PatientRecord rec = storage.getRecord(6, 1714376789050L);
+        assertEquals(null, rec); // Check if null is returned if record is not found
 
         assertEquals(3, numberOfRecords); // Check if three records are added
 
@@ -40,6 +42,9 @@ public class DataStorageTest {
 
         List<Patient> patientList = storage.getAllPatients();
         assertEquals(2, patientList.size());//check number of patients
+
+        storage.getPatient("Patient ID: 3, 1714376789050, Label: Saturation, Data: 98");
+        assertEquals(3, storage.getAllPatients().size());//check number of patients
     }
 
     @Test

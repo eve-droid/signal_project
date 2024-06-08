@@ -1,5 +1,7 @@
-package com.alerts;
+package com.alerts.AlertStrategy;
 
+import com.alerts.AlertGenerator;
+import com.alerts.AlertFactory.BloodOxygenAlertConcreteCreator;
 import com.data_management.PatientRecord;
 import java.util.List; 
 
@@ -8,6 +10,7 @@ import java.util.List;
  */
 public class BloodOxygenStrategy implements AlertStrategy{
 
+    private BloodOxygenAlertConcreteCreator bloodOxygenAlertConcreteCreator;
     private AlertGenerator alertGenerator;
 
     /**
@@ -16,6 +19,7 @@ public class BloodOxygenStrategy implements AlertStrategy{
      */
     public BloodOxygenStrategy(AlertGenerator alertGenerator){
         this.alertGenerator = alertGenerator;
+        this.bloodOxygenAlertConcreteCreator = new BloodOxygenAlertConcreteCreator();
     }
     
     /**
@@ -54,9 +58,9 @@ public class BloodOxygenStrategy implements AlertStrategy{
                 }
             }
             if(systolicPressureTooLow){
-                alertGenerator.triggerAlert(new BloodOxygenAlert(patientId, "Critical Treshold Alert - Hypotensive Hypoxemia Alert", timeStamp));
+                alertGenerator.triggerAlert(bloodOxygenAlertConcreteCreator.createAlert(patientId, "Critical Treshold Alert - Hypotensive Hypoxemia Alert", timeStamp));
             } else{
-                alertGenerator.triggerAlert(new BloodOxygenAlert(patientId, "Critical Treshold Alert - Saturation too low", timeStamp));
+                alertGenerator.triggerAlert(bloodOxygenAlertConcreteCreator.createAlert(patientId, "Critical Treshold Alert - Saturation too low", timeStamp));
             }
         }
 
@@ -66,7 +70,7 @@ public class BloodOxygenStrategy implements AlertStrategy{
         for(int t = patientRecord.size()-2; t >= 0 && patiantData.getTimestamp() >= timeStamp - (10*60*1000); t--){
             patiantData = patientRecord.get(t);
             if((patiantData.getRecordType().equals("Saturation")) && (patiantData.getMeasurementValue() >= measurement +5)){
-                alertGenerator.triggerAlert(new BloodOxygenAlert(patientId, "Decreasing Trend Alert in Saturation", patiantData.getTimestamp()));
+                alertGenerator.triggerAlert(bloodOxygenAlertConcreteCreator.createAlert(patientId, "Decreasing Trend Alert in Saturation", patiantData.getTimestamp()));
                 break;
             }
 

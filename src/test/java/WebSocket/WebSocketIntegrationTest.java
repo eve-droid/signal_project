@@ -1,4 +1,4 @@
-package data_management;
+package WebSocket;
 
 import com.alerts.ConcreteAlert;
 import com.alerts.AlertManager;
@@ -16,7 +16,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 
-import javax.xml.crypto.Data;
 
 import static org.junit.Assert.assertEquals;
 
@@ -29,20 +28,21 @@ public class WebSocketIntegrationTest {
         AlertManager alertManager = new AlertManager(); 
         WebSocketClientR webSocketClientR = new WebSocketClientR(new URI("ws://localhost:8080"), dataStorage, alertManager);
 
-        String message = "Patient ID: 79, Timestamp: 1715250889771, Label: DiastolicPressure, Data: 57";
+        String message = "Patient ID: 11, Timestamp: 1715250889771, Label: DiastolicPressure, Data: 57";
 
         // Simulate receiving a message
         webSocketClientR.onMessage(message);
 
         // Verify that the message is correctly stored
-        PatientRecord record = dataStorage.getRecord(79, 1715250889771L);
+        PatientRecord record = dataStorage.getRecord(11, 1715250889771L);
         String recordString = String.format("Patient ID: %d, Timestamp: %d, Label: %s, Data: %d", record.getPatientId(), record.getTimestamp(), record.getRecordType(), Math.round(record.getMeasurementValue()));
         assertEquals(message, recordString);
 
-        alertManager.evaluateData(new Patient(79), dataStorage);
+        alertManager.evaluateData(new Patient(11), dataStorage);
+
 
         // Verify that the alert is correctly generated
-        List<ConcreteAlert> alertList = alertManager.getAlertsPatient(79);
+        List<ConcreteAlert> alertList = alertManager.getAlertsPatient(11);
         assertEquals("Critical Treshold Alert - Diastolic Pressure too low", alertList.get(0).getCondition()); // Assuming this method exists
     }
 
@@ -67,15 +67,15 @@ public class WebSocketIntegrationTest {
             // Simulate server output to test the connection
             try {
                 Thread.sleep(2000);
-                server.sendDataFromFile("src/test/java/data_management/OutputFilesTest/testAlert.txt");
-                
+                server.sendDataFromFile("src/test/java/OutputFilesTest/testAlert.txt");
+                Thread.sleep(2000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
 
 
         dataStorage.printAllPatients();
-        alertManager.printAllAlerts();
+        //alertManager.printAllAlerts();
         List <ConcreteAlert> alertList = alertManager.getAlertsPatient(7);
 
         assertEquals(14, alertList.size());

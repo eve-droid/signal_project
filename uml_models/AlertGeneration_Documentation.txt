@@ -1,25 +1,9 @@
-Firstly, PatientData is a  component that acts as a data feed for the AlertGenerator, 
-and stores all relevant patient information. This data is continuously fed into the AlertGenerator, 
-providing the input for alert threshold evaluations.
+The Alert Generation System monitors patients in the cardiovascular ward, alerting medical staff based on individualized thresholds. The system consists of several primary classes: AlertGenerator, Alert, ConcreteAlert, AlertManager, and AlertStorage.
 
-The Alert Generation System monitors patients in the cardiovascular ward, alerting medical staff based on individualized thresholds. 
-The system is made up of three primary classes: AlertGenerator, Alert, and AlertManager.
+AlertGenerator is the core class responsible for data processing. It continuously receives data streams from devices such as blood pressure monitors and blood saturation sensors. Each patient has a digital profile within the Cardiovascular Health Management System (CHMS), which includes alert thresholds and their history of alerts. The AlertGenerator compares incoming data against these thresholds. When a data point exceeds a threshold, it instantiates a ConcreteAlert object.
 
-AlertGenerator is the core class, and is responsible fore data processing. 
-It constantly receives data streams from devices sych as blood pressure, blood saturation etc. 
-Each patient has a digital profile within the Cardiovascular Health Management System (CHMS), 
-which includes alert thresholds for each patient and their history of alerts. 
-The AlertGenerator compares incoming data against these thresholds. When a data point exceeds a threshold, it instantiates an Alert object.
+Alert is an interface that defines the structure and behavior of an alert object in the system. It includes methods to get the patient ID, the condition that triggered the alert, and the timestamp of the event. ConcreteAlert is a concrete implementation of the Alert interface, encapsulating all relevant information about the generated alert, such as the patient’s ID, the condition, the specific threshold crossed, the current value, and the timestamp of the event.
 
-The Alert class encapsulates all relevant information about the generated alert. 
-This includes the patient’s ID, the condition that triggered the alert, the specific threshold crossed, 
-the current value, and the timestamp of the event. The Alert object is the object between which the AlertGenerator and 
-the AlertManager can communicate through.
+AlertManager is responsible for managing the ConcreteAlert objects created by the AlertGenerator. It ensures that alerts are sent to the appropriate medical staff and/or devices. The AlertManager maintains a map of alerts for each patient, allowing quick action from doctors and nurses for patients in need.
 
-Finally, AlertManager checks the Alert objects created by the AlertGenerator. 
-It manages the distribution of alerts, ensuring they are sent to the correct medical staff and/or the correct device. 
-The AlertManager improves the safety of the patients, allowing quick action from the doctors and nurses for patients in need.
-
-The UML class diagram visually represents the relationships between these classes. 
-AlertGenerator has an association with Alert, indicated by a solid line with an open arrowhead, 
-signifying the creation of Alert objects. AlertManager is also associated with Alert, managing the instances created by the AlertGenerator.
+AlertStorage is used by the AlertManager to store and retrieve alert data. It maintains a map of alert objects indexed by patient IDs, providing access to all alerts stored in the system.
